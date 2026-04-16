@@ -74,8 +74,8 @@ includes = ["packs/actual/all"]
 ##### Patch "convoy" in Factory and Project
 
 ```bash
-pushd ~/Projects/factory/workshop_w2/w2-project && bd config set types.custom "convoy"
 pushd ~/Projects/factory/workshop_w2/w2-gc-factory && bd config set types.custom "convoy"
+pushd ~/Projects/factory/workshop_w2/w2-project && bd config set types.custom "convoy"
 ```
 
 ##### Restart Factory
@@ -101,5 +101,5 @@ Open Gascity Dashboard in Browser
 ##### Generate Task to Verify Factory
 
 ```bash
-gc sling w2-gc-factory "Create a script that prints hello world"
+gc sling w2-project/architect "Create a script that prints hello world"
 ```
