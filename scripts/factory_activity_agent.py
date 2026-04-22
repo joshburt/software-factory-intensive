@@ -569,6 +569,46 @@ bash skills/factory-activity-agent/scripts/install.sh {activity}
 """
 
 
+def _gc_auto_prefix(name: str) -> str:
+    """Compute the beads prefix gc auto-generates from a directory name.
+
+    gc takes the first letter of each hyphen-separated word, stripping digits:
+      'w1-gc-factory' → 'wgf',  'l2-gc-factory' → 'lgf',  'w1-project' → 'wp'
+
+    This causes collisions: W1 and W2 both get 'wgf', L1 and L2 both get 'lgf'.
+    We use this to identify the old (wrong) prefix so we can rename it.
+    """
+    parts = re.sub(r'\d+', '', name).split('-')
+    return ''.join(p[0] for p in parts if p)
+
+
+def _patch_beads_prefix(beads_dir: Path, old: str, new: str, dry_run: bool = False):
+    """Rename the Dolt DB directory and patch config files while the server is stopped.
+
+    Checks both dolt/ (city-managed DBs) and embeddeddolt/ (rig-managed DBs).
+    Patches config.yaml and metadata.json (which gc reads for dolt_database).
+    Safe to call even if the DB dir doesn't exist (e.g. already renamed).
+    """
+    if old == new:
+        return
+    for sub in ("dolt", "embeddeddolt"):
+        src = beads_dir / sub / old
+        if src.exists():
+            dst = src.parent / new
+            if dry_run:
+                print(f"[dry-run] Rename {src} → {dst}")
+            else:
+                src.rename(dst)
+            break
+    for fname in ("config.yaml", "metadata.json"):
+        f = beads_dir / fname
+        if f.exists():
+            if dry_run:
+                print(f"[dry-run] Patch {f}: {old!r} → {new!r}")
+            else:
+                f.write_text(f.read_text().replace(old, new))
+
+
 def install(activity, dry_run=False, clone_url=None):
     category, _, alias_lower, project_dir, factory_dir, packs_src = resolve_paths(activity)
 
@@ -637,18 +677,57 @@ def install(activity, dry_run=False, clone_url=None):
     # --- Step 3: Register City ---
     print("\n##### Register City")
     run(["gc", "stop"], cwd=str(factory_dir), dry_run=dry_run, check=False)
+
+    # Fix the city beads prefix so parallel installs (W1+W2, L1+L2, …) don't
+    # share a Dolt database name.  gc strips digits when deriving the prefix
+    # ('w1-gc-factory' → 'wgf', 'w2-gc-factory' → 'wgf'), causing a Dolt
+    # exclusive-lock conflict when two factories with the same prefix run
+    # simultaneously.  We rename the DB dir and patch config while the server
+    # is stopped, before gc register starts it with the corrected name.
+    _old_city_pfx = _gc_auto_prefix(f"{alias_lower}-gc-factory")
+    _new_city_pfx = f"{alias_lower}f"
+    if _old_city_pfx != _new_city_pfx:
+        print(f"  Fixing city beads prefix: {_old_city_pfx!r} → {_new_city_pfx!r}")
+        _patch_beads_prefix(factory_dir / ".beads", _old_city_pfx, _new_city_pfx, dry_run)
+
     run(["gc", "register", str(factory_dir)], dry_run=dry_run, check=False)
     run(["gc", "service", "restart"], dry_run=dry_run, check=False)
     run(["gc", "status"], dry_run=dry_run, check=False)
     run(["gc", "doctor", "--fix"], dry_run=dry_run, check=False)
 
     # --- Step 4: Add Rig ---
+    # Sweep stale session beads BEFORE gc rig add so the reconciler starts
+    # clean. Must happen before rig add because gc rig add triggers its own
+    # internal restart cycle (unregister → register → start), which is the
+    # LAST restart during install. A second explicit gc stop/start after rig
+    # add would wipe the rig's beads database: gc rig add stores the rig DB
+    # in the rig's .beads/embeddeddolt/, but the city's Dolt server data_dir
+    # only covers the city's .beads/dolt/. The internal restart in gc rig add
+    # registers both; a subsequent stop/start regenerates the server config
+    # with only the city data_dir, losing the rig DB.
+    print("\n##### Sweep stale sessions")
+    close_stale_sessions(factory_dir, dry_run=dry_run)
+
     print("\n##### Add Rig")
     project_name = f"{alias_lower}-project"
+    # Pass --prefix explicitly so gc rig add uses the unique per-activity prefix
+    # instead of auto-deriving a non-unique one ('w1-project' → 'wp' = 'w2-project').
+    _new_rig_pfx = f"{alias_lower}p"
     run(
-        ["gc", "rig", "add", str(project_dir), "--include", "packs/actual/all"],
+        ["gc", "rig", "add", str(project_dir),
+         "--include", "packs/actual/all",
+         "--prefix", _new_rig_pfx],
         cwd=str(factory_dir), dry_run=dry_run, check=False,
     )
+
+    # gc rig add writes the city prefix into the rig's routes.jsonl. Even with
+    # metadata.json already patched, gc may derive the prefix from the directory
+    # name rather than the file. Patch routes.jsonl as a belt-and-suspenders fix.
+    rig_routes = project_dir / ".beads" / "routes.jsonl"
+    if dry_run:
+        print(f"[dry-run] Patch {rig_routes}: {_old_city_pfx!r} → {_new_city_pfx!r}")
+    elif rig_routes.exists():
+        rig_routes.write_text(rig_routes.read_text().replace(_old_city_pfx, _new_city_pfx))
 
     # Patch default_sling_target and [providers.claude] into city.toml.
     # gc rig add marshals and rewrites city.toml, dropping fields from
@@ -683,28 +762,15 @@ def install(activity, dry_run=False, clone_url=None):
             )
         city_toml_dest.write_text(content)
 
-    # --- Step 5: Restart Factory ---
-    # Sweep stale session beads BEFORE restart so the reconciler
-    # starts clean and doesn't see orphaned sessions from a previous install.
-    print("\n##### Sweep stale sessions")
-    close_stale_sessions(factory_dir, dry_run=dry_run)
-
-    # Start the factory so gc manages the Dolt server lifecycle.
-    # Use stop → start (not restart) to avoid config-drift: gc restart
-    # does an unregister/register cycle that changes the config hash,
-    # which would immediately drain any sessions just spawned.
-    print("\n##### Restart Factory")
-    run(["gc", "stop"], cwd=str(factory_dir), dry_run=dry_run, check=False)
-    run(["gc", "start"], cwd=str(factory_dir), dry_run=dry_run, check=False)
-
-    # Wait for the reconciler to finish spawning sessions before proceeding.
-    # This ensures agents are active before we sling work, and catches any
-    # orphaned session beads created during the restart.
+    # --- Step 5: Wait for reconciler ---
+    # gc rig add's internal restart is the last restart during install.
+    # Wait for the reconciler to settle so agents are active before we
+    # sling work, and catch any orphaned session beads from the restart.
     wait_for_reconciler(factory_dir, dry_run=dry_run)
 
     # --- Step 6: Register custom bead types ---
     # gc doctor --fix registers all required types (molecule, session, convoy, etc.)
-    # Must run after gc start so the Dolt server is available.
+    # Must run after gc rig add so the rig's Dolt database is accessible.
     print("\n##### Register custom bead types")
     run(
         ["gc", "doctor", "--fix"],
