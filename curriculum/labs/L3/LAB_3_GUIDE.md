@@ -18,8 +18,6 @@ Through this lab you will:
 - Run a feature from the ADR you produced in L2 all the way to a committed implementation with passing tests
 - Iterate on one failure by editing the agent's prompt (not the chat) and re-running
 
-> **Fired Up Pizza reference:** For a finished spec/code pair produced by this stage pair, see [`reference-project/fired-up-pizza/design/loyalty-points-spec.md`](../../../reference-project/fired-up-pizza/design/loyalty-points-spec.md) and the reference source tree under [`reference-project/fired-up-pizza/src/`](../../../reference-project/fired-up-pizza/src/). Use it as shape reference — your MCP-backed specs and code will look different because they are grounded in your systems, not pizza shop metadata.
-
 ## What You'll Build
 
 ```
@@ -69,7 +67,7 @@ The install step copies your **central deliverables folder** (`software-factory-
 ls ~/Projects/factory/lab_l3/l3-project/docs/
 ```
 
-You should see `PROJECT_MANIFEST.md`, `SOFTWARE_FACTORY_MANIFEST.md`, `factory-pipeline.md`, `coordination-channels.md`, and `factory-iterations.md`.
+You should see `PROJECT_MANIFEST.md`, `SOFTWARE_FACTORY_MANIFEST.md`, `factory-pipeline.md`, and `coordination-channels.md`. (`factory-iterations.md` is authored in W4; you won't have it yet.)
 
 Per-feature artifacts from L2 — `work-packages/` and your project source — are *not* in `docs/`, so they aren't carried by the central-docs seed. Pull them in by hand if you want to continue the same feature in L3:
 
@@ -253,9 +251,3 @@ Before leaving this lab, verify all of these:
 ## Next Steps
 
 **[L4](../L4/LAB_4_GUIDE.md)** installs the Reviewer and Deployer against your project. Both read the `PROJECT_MANIFEST` for their standards (Review Standards and Release Criteria respectively), and the Reviewer will inspect the exact feature branch you produced in this lab.
-
-Bring to L4:
-
-- [ ] A running L3 factory with the feature branch from Part 4 committed
-- [ ] Updated `docs/factory-pipeline.md` reflecting the Designer + Coder MCPs
-- [ ] Your iteration log with at least one L3 entry
