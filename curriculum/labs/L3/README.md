@@ -78,6 +78,16 @@ When the planner closes its step, the store checks which other steps depended on
 
 The agents don't know about each other. Each one works its assigned bead, reads whatever project files exist (including artifacts upstream agents wrote), and closes the bead when done. The store evaluates dependencies and surfaces the next ready step.
 
+## Working directory
+
+Unless a step says otherwise, run all commands in this lab from:
+
+```
+~/path/to/software-factory-intensive/my-factory
+```
+
+"Step 6: Inspect Outputs" is the only step that cds into the rig; the snippet flags it explicitly.
+
 ## 1. Enable formula v2
 
 This is a one-time city setting. Confirm `my-factory/city.toml` contains:
@@ -103,10 +113,9 @@ source = "../packs/lessons/L3"
 ## 3. Sync the Existing Rig
 
 Root default imports are applied when a rig is created. Because you are keeping
-the same rig from L2, sync it explicitly:
+the same rig from L2, sync it explicitly. From `my-factory/`:
 
 ```bash
-cd my-factory
 gc --rig <rig> import remove factory
 gc --rig <rig> import add ../packs/lessons/L3 --name factory
 gc restart
@@ -121,13 +130,15 @@ gc rig list
 
 ## 4. Start the Formula
 
+Use the rig-qualified target (replace `<rig>` with your rig name and the feature description with your own):
+
 ```bash
-gc sling planner \
-  "Add a percent operation: percent(whole, fraction) returns whole*fraction/100" \
+gc sling <rig>/factory.planner \
+  "<a small feature for your project>" \
   --on mol-feature-delivery
 ```
 
-Capture the workflow bead id printed by `Attached workflow ...`.
+For example, on the Fired Up Pizza reference project: `"Add a loyalty-points line to the cart total"`. Capture the workflow bead id printed by `Attached workflow ...`.
 
 ## 5. Watch Progress
 
@@ -151,14 +162,16 @@ Use all six observability commands from L2. Watch the four-agent handoff.
 
 ## 6. Inspect Outputs
 
-In your project rig, verify:
+**Switch to:** `~/path/to/your-project` for this step, then return to `my-factory` for steps 7–8.
 
 ```bash
+cd ~/path/to/your-project
 ls docs/plans
 ls docs/architecture
 ls docs/designs
 git log --oneline -5
-npm test
+npm test       # or `node --test`
+cd -           # back to my-factory
 ```
 
 Expected outputs:
@@ -187,7 +200,7 @@ Contents:
 ```markdown
 ---
 name: testing-conventions
-description: Project-specific testing conventions for the calculator.
+description: Project-specific testing conventions for this project.
 ---
 
 These rules are mandatory for all test files in this project:
@@ -215,7 +228,7 @@ Before writing tests, read the testing-conventions skill and follow its rules fo
 
 ```bash
 gc restart
-gc sling planner "Add a <different feature>" \
+gc sling <rig>/factory.planner "<a different small feature>" \
   --on mol-feature-delivery
 ```
 
@@ -229,7 +242,7 @@ For the rest of the lab, continue adding new skills to the other agents. For exa
 
 ## Exit Criteria
 
-- The run started with one `gc sling planner ... --on mol-feature-delivery`.
+- The run started with one `gc sling <rig>/factory.planner ... --on mol-feature-delivery`.
 - No stage labels or manual downstream beads were used.
 - The graph routed all four roles.
 - The builder committed the implementation and tests.

@@ -65,6 +65,8 @@ The imported agents are rig-scoped:
 <rig>/factory.release-gate
 ```
 
+"Step 6: Inspect Outputs" cds into the rig; the snippet flags it. The retrospective in step 7 is written under the curriculum repo's `activities/capstone/C1/`.
+
 ## 1. Confirm formula v2
 
 Confirm `my-factory/city.toml` contains:
@@ -89,8 +91,9 @@ source = "../packs/lessons/C1"
 
 ## 3. Sync the Existing Rig
 
+From `my-factory/`:
+
 ```bash
-cd my-factory
 gc --rig <rig> import remove factory
 gc --rig <rig> import add ../packs/lessons/C1 --name factory
 gc restart
@@ -99,9 +102,11 @@ gc doctor
 
 ## 4. Start the Formula
 
+Use the rig-qualified target (replace `<rig>` with your rig name and the feature description with your own):
+
 ```bash
-gc sling planner \
-  "Add a multiply operation: multiply(a, b) returns a*b" \
+gc sling <rig>/factory.planner \
+  "<an unfamiliar feature request from your real backlog>" \
   --on mol-release-delivery
 ```
 
@@ -125,9 +130,10 @@ factory.planner -> factory.architect -> factory.designer -> factory.builder -> f
 
 ## 6. Inspect Outputs
 
-In your project rig:
+**Switch to:** `~/path/to/your-project` for this step, then return to `my-factory`.
 
 ```bash
+cd ~/path/to/your-project
 ls docs/plans
 ls docs/architecture
 ls docs/designs
@@ -135,7 +141,8 @@ ls docs/validation
 ls docs/reviews
 ls docs/releases
 git log --oneline -5
-npm test
+npm test       # or `node --test`
+cd -           # back to my-factory
 ```
 
 Expected outputs:
@@ -198,7 +205,7 @@ explicitly instead of inventing one.
 
 ## Exit Criteria
 
-- The run started with one `gc sling planner ... --on mol-release-delivery`.
+- The run started with one `gc sling <rig>/factory.planner ... --on mol-release-delivery`.
 - No stage labels or manual downstream beads were used.
 - All seven agents received and completed their formula steps.
 - The release gate includes an explicit verdict backed by validation and review evidence.

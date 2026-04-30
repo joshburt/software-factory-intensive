@@ -61,6 +61,16 @@ The imported agents are rig-scoped:
 <rig>/factory.release-gate
 ```
 
+## Working directory
+
+Unless a step says otherwise, run all commands in this lab from:
+
+```
+~/path/to/software-factory-intensive/my-factory
+```
+
+"Step 6: Inspect Outputs" and "Step 7: Prove the manifest is load-bearing" both step into the rig; their snippets flag it.
+
 ## 1. Confirm formula v2
 
 Confirm `my-factory/city.toml` contains:
@@ -85,8 +95,9 @@ source = "../packs/lessons/L4"
 
 ## 3. Sync the Existing Rig
 
+From `my-factory/`:
+
 ```bash
-cd my-factory
 gc --rig <rig> import remove factory
 gc --rig <rig> import add ../packs/lessons/L4 --name factory
 gc restart
@@ -95,9 +106,11 @@ gc doctor
 
 ## 4. Start the Formula
 
+Use the rig-qualified target (replace `<rig>` with your rig name and the feature description with your own):
+
 ```bash
-gc sling planner \
-  "Add a clamp operation: clamp(x, lo, hi) returns x bounded to [lo, hi]" \
+gc sling <rig>/factory.planner \
+  "<a small feature for your project>" \
   --on mol-delivery-review
 ```
 
@@ -123,16 +136,18 @@ Use the observability commands from L2. Watch for review findings and release ve
 
 ## 6. Inspect Outputs
 
-In your project rig:
+**Switch to:** `~/path/to/your-project` for this step, then return to `my-factory`.
 
 ```bash
+cd ~/path/to/your-project
 ls docs/plans
 ls docs/architecture
 ls docs/designs
 ls docs/reviews
 ls docs/releases
 git log --oneline -5
-npm test
+npm test       # or `node --test`
+cd -           # back to my-factory
 ```
 
 Expected outputs:
@@ -152,8 +167,7 @@ A complete L4 run should produce artifacts with these sections:
 | Review | Verdict, Summary, Findings, Test Evidence, Recommendation, References |
 | Release gate | Verdict, Required Checks, Evidence, Risks, Decision Notes, References |
 
-For the example above, the feature adds `clamp(x, lo, hi)` and `npm test`
-should show 8 tests, 8 passing.
+For your chosen feature, `npm test` (or your project's equivalent) should exit 0 with the new tests included.
 
 ## 7. Prove the manifest is load-bearing
 
@@ -161,7 +175,9 @@ The reviewer and release-gate prompts in this lesson pack read `PROJECT_MANIFEST
 
 You're about to prove that by adding standards and watching the output change.
 
-Open the manifest you created at `docs/PROJECT_MANIFEST.md` and add:
+**Step into:** `~/path/to/your-project` to edit the manifest, then return to `my-factory` for the re-sling.
+
+Open the manifest you created at `~/path/to/your-project/docs/PROJECT_MANIFEST.md` and add:
 
 - Add at least 4 Review Standards with checkable rules and severity mapping
 - Add at least 6 Release Criteria with binary PASS/FAIL gates and evidence sources
@@ -178,8 +194,8 @@ Use standards like these:
 Then re-sling with a different feature:
 
 ```bash
-gc sling planner \
-  "Add a modulo operation: mod(a, b) returns a%b" \
+gc sling <rig>/factory.planner \
+  "<a different small feature>" \
   --on mol-delivery-review
 ```
 
@@ -192,7 +208,7 @@ If the manifest change produced no visible difference, the reviewer or release-g
 
 ## Exit Criteria
 
-- The run started with one `gc sling planner ... --on mol-delivery-review`.
+- The run started with one `gc sling <rig>/factory.planner ... --on mol-delivery-review`.
 - No stage labels or manual downstream beads were used.
 - All six agents received and completed their formula steps.
 - The release gate includes an explicit verdict backed by evidence.

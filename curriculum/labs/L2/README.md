@@ -55,6 +55,16 @@ The city selects the active lesson pack. The project rig keeps the work and
 artifacts. That means you keep the same rig across lessons and only change
 which lesson factory pack is active.
 
+## Working directory
+
+Unless a step says otherwise, run all commands in this lab from:
+
+```
+~/path/to/software-factory-intensive/my-factory
+```
+
+"Part 4: Inspect The Artifacts" reads files inside `~/path/to/your-project`; the snippet flags the cd. If Part 3 hits the `issue_prefix` error you'll also temporarily cd into the rig — see the troubleshooting reference there.
+
 ## Prerequisites
 
 - You have copied `my-factory/pack.toml.template` to `my-factory/pack.toml`.
@@ -67,6 +77,7 @@ formula_v2 = true
 ```
 
 - Your project rig has already been added with `gc rig add`.
+- The city's beads database is initialized (L1 step "Initialize the city's beads database").
 
 ## Part 1: Select L2 As The Active Lesson
 
@@ -84,24 +95,23 @@ are still rig-scoped, so the Planner target is:
 <rig>/factory.planner
 ```
 
-Because your rig already exists, sync that rig to the L2 pack:
+If you ran `gc rig add` in L1 with the default `pack.toml`, your rig already has a `factory` import pointing at L2 — you can skip ahead. Verify with:
 
 ```bash
 cd my-factory
+gc --rig <rig> import list
+```
+
+If the `factory` import does not exist (or points elsewhere), set it explicitly:
+
+```bash
+gc --rig <rig> import remove factory   # only if it already exists
 gc --rig <rig> import add ../packs/lessons/L2 --name factory
 ```
 
-If the `factory` import already exists from another lesson, replace it:
+Then check the factory:
 
 ```bash
-gc --rig <rig> import remove factory
-gc --rig <rig> import add ../packs/lessons/L2 --name factory
-```
-
-Restart and check the factory:
-
-```bash
-gc restart
 gc doctor
 ```
 
@@ -133,10 +143,14 @@ Your workflow card described how you work with one agent. The planner prompt doe
 
 ## Part 3: Run The Formula
 
-From `my-factory`, sling one request to the lesson Planner (replace the feature name with your own):
+**Working in:** `~/path/to/software-factory-intensive/my-factory` for this part.
+
+If `gc sling` fails with `database not initialized: issue_prefix config is missing`, the rig's beads database wasn't fully bootstrapped by `gc rig add` — see [troubleshooting/beads.md#issue-issue_prefix-config-is-missing](../../../troubleshooting/beads.md#issue-issue_prefix-config-is-missing) (scenario B). The fix runs `bd init` from the rig directory, then returns to `my-factory/`.
+
+From `my-factory`, sling one request to the lesson Planner using the rig-qualified target (replace `<rig>` with your rig name and the feature name with your own):
 
 ```bash
-gc sling planner "Plan the loyalty points feature for Fired Up Pizza" --on mol-feature-intake
+gc sling <rig>/factory.planner "Plan the loyalty points feature for Fired Up Pizza" --on mol-feature-intake
 ```
 
 Watch progress:
@@ -176,11 +190,13 @@ You will use these throughout L3, L4, and C1.
 
 ## Part 4: Inspect The Artifacts
 
-In your project rig, inspect:
+**Switch to:** `~/path/to/your-project` for this part, then return to `my-factory` for Parts 5–7.
 
 ```bash
+cd ~/path/to/your-project
 ls docs/plans
 ls docs/architecture
+cd -    # back to my-factory
 ```
 
 The plan should include:
@@ -243,7 +259,7 @@ Before writing acceptance criteria, use the Context7 MCP to look up the latest n
 3. Restart and re-sling:
 
        gc restart
-       gc sling planner "Plan <another feature>" \
+       gc sling <rig>/factory.planner "Plan <another feature>" \
          --on mol-feature-intake
 
 4. Compare the two plan artifacts. The second plan should reference specific node:test API details (assert.strictEqual, describe blocks) that came from Context7 — not generic knowledge.
