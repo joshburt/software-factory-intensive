@@ -40,7 +40,36 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+Gates are derived from the ratified constitution at `.specify/memory/constitution.md`.
+Record each applicable article as PASS, N/A, or a justified violation. Violations MUST be
+recorded in the Complexity Tracking table below — never silently accepted.
+
+| Article | Gate | Status |
+|---------|------|--------|
+| I — Config Over Prompting | Behavior changes land in committed config, not chat corrections | [PASS/N/A] |
+| II — Curriculum-Blind Pack Internals | No class/lab/workshop/lesson language inside `packs/**` | [PASS/N/A] |
+| III — Self-Contained Lesson Packs | Pack is complete and standalone; current formula contract; binding-qualified routes | [PASS/N/A] |
+| IV — Walkthroughs Are the Source of Truth | Curriculum claims reconciled against `test-harness/walkthrough-snapshots/<lesson>/`; taught capabilities match shipped pack behavior or are explicitly disclaimed | [PASS/N/A] |
+| V — No Internal Tooling Leakage | No harness/snapshot references or version-branded names in student-facing content | [PASS/N/A] |
+| VI — Formula-Owned Orchestration | No agent-side scheduling; no banned patterns SFI001–SFI008 | [PASS/N/A] |
+| VII — Every Session Has a Named Deliverable | `## Deliverable` section present; lesson contract updated if runnable | [PASS/N/A] |
+| VIII — Layered Verification Gates | Applicable harness rungs identified and run; no check weakened or deleted | [PASS/N/A] |
+| IX — Reproducible Student Path | Clean-machine path verified; tool versions asserted; troubleshooting linked | [PASS/N/A] |
+| X — Isolated, Reversible Harness Runs | Runs isolated and self-cleaning; no concurrent live chains; surgical cleanup | [PASS/N/A] |
+| XI — Manifest Authority | Each agent prompt names its authoritative manifest section; explicit fallback when absent | [PASS/N/A] |
+| XII — Step Contracts and Explicit Done-Conditions | Each step declares target, deps, inputs, artifact, close condition, failure behavior; handoffs explicit | [PASS/N/A] |
+| XIII — Every Procedure Specifies Its Failure Path | Concrete failure response per procedure; rollback declared; every verdict has a consequence or is advisory-only | [PASS/N/A] |
+| XIV — Human Decision Authority | Human-owned decision domains taught with reasoning; gates justified with PASS/FAIL/resumption; unimplemented gates disclosed; named review owner | [PASS/N/A] |
+
+Verification commands (cheapest first):
+
+```bash
+python3 test-harness/lesson-pack-lint.py
+bash test-harness/migration-check.sh
+bash test-harness/tutorial-check.sh
+bash test-harness/behavioral-smoke.sh
+bash test-harness/tutorial-walkthrough.sh <lesson>   # live tokens; pre-release only
+```
 
 ## Project Structure
 
