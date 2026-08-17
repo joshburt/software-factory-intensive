@@ -1,26 +1,92 @@
-# Beads / Dolt files (added by bd init)
-.dolt/
-*.db
-.beads-credential-key
-.beads/
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+coverage/
 
-# Gas City runtime state (per-machine, not source)
-.gc/
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.jsonl
+
+# Benchmark pinned dataset blobs (spec 069) — the pin (upstream commit +
+# content hash) is committed in the suite registry; the multi-megabyte
+# materialised parquet payload is not. The result ledger history must NOT be
+# ignored, which is why the ledger uses .ndjson rather than .jsonl (research D9).
+benchmarks/datasets/*
+!benchmarks/datasets/.gitkeep
+
+# Spec Kit generated artifacts — runtime-only, change on every converter run
+specs/*/.beads-manifest.json
+specs/*/.beads/
+
+# Runtime session state
 .runtime/
 
-# Claude Code local settings. Pack overlays may intentionally contain
-# overlay/.claude/settings.json and should be tracked.
-.claude/
-!.claude/
-.claude/*
-!.claude/skills/
-!.claude/skills/**
-!**/overlay/.claude/
-!**/overlay/.claude/**
-.vscode/settings.json
+# Smorgasbord runtime state
+.smorgasbord.log
+.smorgasbord.pid
 
-# macOS editor/swap tempfiles (e.g. .!PID!filename)
-.!*!*
+# Added by speckit-implement for spec 010
+*.pyo
+.ruff_cache/
 
-# Scratch review / experiment directories
-.tmp/
+# Gas Town / Beads / Dolt local workspace state — this repo is itself a Gas
+# Town rig, so `bd`/`gt dolt start`/`gt install` create machine-specific
+# local state at repo root (absolute paths, local ports, binary backups,
+# role directories). Never shared; real work-item sync happens via
+# refs/dolt/data on the git remote, not these files. Root-anchored since
+# these names could otherwise collide with legitimately-named source dirs.
+/.beads/
+/.dolt-data/
+/mayor/
+/daemon/
+/deacon/
+/rigs.json
+
+# Local darkharbour data dir (runtime state during development)
+.darkharbour/
+
+# Beads — local database state per checkout, not git-tracked
+/.beads/
+!/.beads/README.md
+
+# Private keys and credential material — the constitution requires secrets
+# never touch git. Deny by default: add an explicit negation if a fixture
+# genuinely needs to be tracked.
+*.pem
+*.p12
+*.pfx
+*.key
+*_rsa
+*_ed25519
+*.private-key*
+id_rsa*
+# age identities (the project's secrets mechanism)
+*.agekey
+*.age.key
