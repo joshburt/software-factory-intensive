@@ -1,0 +1,3 @@
+[submodule "reference-project/fired-up-pizza"]
+	path = reference-project/fired-up-pizza
+	url = https://github.com/joshburt/fired-up-pizza.git
