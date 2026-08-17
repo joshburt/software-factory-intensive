@@ -24,15 +24,18 @@ write_c1_factory_configs() {
 [pack]
 name = "my-factory"
 schema = 2
-
-[defaults.rig.imports.factory]
-source = "../packs/lessons/C1"
 TOML
 
   cat > "$WALK_C1_FACTORY/city.toml" <<TOML
 [workspace]
 name = "$WALK_C1_CITY_NAME"
-provider = "claude"
+provider = "opencode"
+
+[providers.opencode]
+base = "builtin:opencode"
+
+[defaults.rig.imports.factory]
+source = "../packs/lessons/C1"
 
 [session]
 startup_timeout = "3m"

@@ -46,7 +46,7 @@ C1 is the whole factory as one graph:
 plan -> architecture -> design -> build -> validate -> review -> release
 ```
 
-The factory pack is selected in `my-factory/pack.toml`:
+The factory pack is selected in `my-factory/city.toml`:
 
 ```toml
 [defaults.rig.imports.factory]
@@ -78,13 +78,9 @@ formula_v2 = true
 
 ## 2. Select the C1 Factory Pack
 
-Edit `my-factory/pack.toml`:
+Edit `my-factory/city.toml`:
 
 ```toml
-[pack]
-name = "my-factory"
-schema = 2
-
 [defaults.rig.imports.factory]
 source = "../packs/lessons/C1"
 ```

@@ -6,7 +6,7 @@ This directory holds the student-facing deliverables for each session. The long 
 
 Activities are where you write notes, run reports, and local design artifacts. They are not where workflow routing lives.
 
-For runnable labs, the active factory is selected from `my-factory/pack.toml`:
+For runnable labs, the active factory is selected from `my-factory/city.toml`:
 
 ```toml
 [defaults.rig.imports.factory]

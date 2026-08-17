@@ -6,7 +6,7 @@ L4 switches the active factory pack to `packs/lessons/L4`, then runs one
 formula graph through Planner, Architect, Designer, Builder, Reviewer, and
 Release Gate.
 
-Factory selection in `my-factory/pack.toml`:
+Factory selection in `my-factory/city.toml`:
 
 ```toml
 [defaults.rig.imports.factory]

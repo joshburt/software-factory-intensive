@@ -21,7 +21,7 @@ Make sure `my-factory/city.toml` has formula v2 enabled:
 formula_v2 = true
 ```
 
-Make sure `my-factory/pack.toml` selects the L2 lesson pack:
+Make sure `my-factory/city.toml` selects the L2 lesson pack:
 
 ```toml
 [defaults.rig.imports.factory]

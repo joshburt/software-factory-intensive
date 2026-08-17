@@ -46,7 +46,7 @@ cd ~/path/to/your-project/docs
 npx skills add https://github.com/audiojak/manifest-generator
 ```
 
-Follow the steps to install the skill for your specific coding agent(s). Each agent has its own skill location — for example, Claude Code reads `.claude/skills`, OpenCode/Codex CLI/etc. read other paths. Select the install option matching your agent, then choose the Installation scope and Method (Symlink recommended).
+Follow the steps to install the skill for your specific coding agent(s). Agents differ in where they look for skills: Claude Code reads `.claude/skills`, Codex CLI reads `.agents/skills`, and OpenCode reads `.opencode/skills` plus `.claude/skills` and `.agents/skills`. Select the install option matching your agent, then choose the Installation scope and Method (Symlink recommended).
 
 Once the skill is installed, you can invoke it inside a session with your coding agent (Claude Code, Codex CLI, OpenCode, etc.):
 
@@ -158,7 +158,7 @@ gc doctor --fix
 
 If `gc doctor` reports `bd create: ... issue_prefix config is missing`, see [troubleshooting/beads.md#issue-issue_prefix-config-is-missing](troubleshooting/beads.md#issue-issue_prefix-config-is-missing).
 
-The default template selects the L2 factory:
+The default `city.toml` template selects the L2 factory:
 
 ```toml
 [defaults.rig.imports.factory]

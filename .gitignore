@@ -76,6 +76,22 @@ specs/*/.beads/
 /.beads/
 !/.beads/README.md
 
+# Gas City materialized skill sinks — generated, never committed.
+# `gc` symlinks pack skills into a per-provider sink at startup. The links point
+# into a machine-local cache (~/.gc/cache/..., <city>/.gc/system/packs/...), so a
+# committed sink resolves only on the machine that generated it and is broken for
+# everyone else. Patterns are narrow on purpose: the tracked maintainer skills in
+# /.claude/skills/ and the tracked /.agents/skills symlink must stay tracked.
+# See vault/Discoveries/2026-08-17-installation-understates-opencode-support.md
+**/.claude/skills/gc-*
+**/.claude/skills/*.gc-*
+**/.agents/skills/gc-*
+**/.agents/skills/*.gc-*
+**/.opencode/skills/
+**/.gemini/skills/
+**/.codex/skills/
+**/.mimocode/skills/
+
 # Private keys and credential material — the constitution requires secrets
 # never touch git. Deny by default: add an explicit negation if a fixture
 # genuinely needs to be tracked.

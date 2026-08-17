@@ -60,6 +60,7 @@ recorded in the Complexity Tracking table below — never silently accepted.
 | XII — Step Contracts and Explicit Done-Conditions | Each step declares target, deps, inputs, artifact, close condition, failure behavior; handoffs explicit | [PASS/N/A] |
 | XIII — Every Procedure Specifies Its Failure Path | Concrete failure response per procedure; rollback declared; every verdict has a consequence or is advisory-only | [PASS/N/A] |
 | XIV — Human Decision Authority | Human-owned decision domains taught with reasoning; gates justified with PASS/FAIL/resumption; unimplemented gates disclosed; named review owner | [PASS/N/A] |
+| XV — Durable Project Memory | Decisions/discoveries recorded in `vault/` as work happens; notes ship in this changeset; frontmatter + tag vocabulary valid; no `canonical` set by an agent | [PASS/N/A] |
 
 Verification commands (cheapest first):
 

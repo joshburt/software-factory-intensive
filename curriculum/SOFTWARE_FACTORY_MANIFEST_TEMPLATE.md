@@ -37,6 +37,14 @@ Tech stack: [summary from PROJECT_MANIFEST.md].]
 - **Gate 1 — After Architect:** Human approves ADR before Designer runs.
 - **Gate 2 — After Reviewer:** Human approves review report before Deployer runs.
 
+> **Note:** the lesson-pack factories shipped with this curriculum (`packs/lessons/`)
+> do not implement these as automated stop-and-wait steps — every agent runs to
+> completion and the graph does not pause for approval. "Human approves" here
+> means you review the artifact (e.g. via `gc session peek` or the produced
+> `docs/` files) between runs, not that the factory blocks on it. Wiring an
+> actual pause-for-approval step into a formula graph is the kind of change
+> Workshop W3 (Architect Multi-Agent Coordination) walks you through.
+
 ## Per-Agent System Prompt Seeds
 
 **Planner:** "[seed]"

@@ -12,8 +12,7 @@ gc register .
 gc rig add ~/path/to/your-repo
 ```
 
-Formula v2 is enabled once in `city.toml`. Lesson selection happens in
-`pack.toml`:
+Formula v2 and lesson selection are both set once in `city.toml`:
 
 ```toml
 [defaults.rig.imports.factory]

@@ -5,7 +5,7 @@
 C1 switches the active factory pack to `packs/lessons/C1`, then runs the full
 release-delivery formula graph.
 
-Factory selection in `my-factory/pack.toml`:
+Factory selection in `my-factory/city.toml`:
 
 ```toml
 [defaults.rig.imports.factory]

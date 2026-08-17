@@ -1,6 +1,28 @@
 [workspace]
 name = "my-factory"
-provider = "claude"
+# Which agent CLI runs your factory. Every agent inherits this unless it sets its
+# own `provider`. Valid values include: opencode, claude, codex, gemini, cursor,
+# copilot. See installation.md for the full list.
+provider = "opencode"
+
+# Gas City needs a catalog entry for the provider named above. `gc doctor --fix`
+# adds it automatically; it is written out here so the config also validates
+# before doctor runs. If you change `provider`, change this to match —
+# e.g. [providers.claude] with base = "builtin:claude".
+[providers.opencode]
+base = "builtin:opencode"
+
+# Agent lifecycle hooks (session-ID persistence, context handoff on compaction)
+# are configured PER AGENT on Gas City 1.4.x — set install_agent_hooks in
+# packs/lessons/<lesson>/agents/<name>/agent.toml. Setting it here at workspace
+# level is deprecated.
+
+# Which lesson factory this city imports into each rig. Change the source path
+# when you move to another lesson, then re-sync the rig:
+#   gc --rig <rig> import remove factory
+#   gc --rig <rig> import add ../packs/lessons/L3 --name factory
+[defaults.rig.imports.factory]
+source = "../packs/lessons/L2"
 
 [session]
 startup_timeout = "3m"

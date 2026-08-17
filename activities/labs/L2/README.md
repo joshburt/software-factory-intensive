@@ -16,7 +16,7 @@ Architect connected by one formula graph.
 
 ## Select The L2 Factory Pack
 
-In `../../../my-factory/pack.toml`, set the active factory import:
+In `../../../my-factory/city.toml`, set the active factory import:
 
 ```toml
 [defaults.rig.imports.factory]
@@ -26,7 +26,7 @@ source = "../packs/lessons/L2"
 The imported agents remain rig-scoped. With the binding named `factory`, the
 Planner target is `<rig>/factory.planner`.
 
-If you already ran `gc rig add` in L1 with the L2 default pack.toml, the import already points at L2 — you can skip the explicit sync. Otherwise:
+If you already ran `gc rig add` in L1 with the L2 default city.toml, the import already points at L2 — you can skip the explicit sync. Otherwise:
 
 ```bash
 cd ../../../my-factory

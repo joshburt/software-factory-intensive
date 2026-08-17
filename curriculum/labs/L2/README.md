@@ -81,7 +81,7 @@ formula_v2 = true
 
 ## Part 1: Select L2 As The Active Lesson
 
-Open `my-factory/pack.toml` and set the city-wide active factory import:
+Open `my-factory/city.toml` and set the city-wide active factory import:
 
 ```toml
 [defaults.rig.imports.factory]
@@ -95,7 +95,7 @@ are still rig-scoped, so the Planner target is:
 <rig>/factory.planner
 ```
 
-If you ran `gc rig add` in L1 with the default `pack.toml`, your rig already has a `factory` import pointing at L2 — you can skip ahead. Verify with:
+If you ran `gc rig add` in L1 with the default `city.toml`, your rig already has a `factory` import pointing at L2 — you can skip ahead. Verify with:
 
 ```bash
 cd my-factory

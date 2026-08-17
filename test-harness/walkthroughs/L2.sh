@@ -25,15 +25,18 @@ write_l2_factory_configs() {
 [pack]
 name = "my-factory"
 schema = 2
-
-[defaults.rig.imports.factory]
-source = "../packs/lessons/L2"
 TOML
 
   cat > "$WALK_L2_FACTORY/city.toml" <<TOML
 [workspace]
 name = "$WALK_L2_CITY_NAME"
-provider = "claude"
+provider = "opencode"
+
+[providers.opencode]
+base = "builtin:opencode"
+
+[defaults.rig.imports.factory]
+source = "../packs/lessons/L2"
 
 [session]
 startup_timeout = "3m"

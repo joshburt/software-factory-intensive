@@ -58,21 +58,56 @@ You need **at least one** CLI coding agent. Multiple agents give broader capabil
 
 ### Recommended
 
+- **[OpenCode](https://github.com/anomalyco/opencode)** (`curl -fsSL https://opencode.ai/install | bash` or `brew install anomalyco/tap/opencode`) — `provider = "opencode"`. **This is the shipped default** in `my-factory/city.toml.template`. No paid subscription required — runs on pay-as-you-go API credits (Anthropic, OpenRouter) or provider-native auth.
 - **Claude Code** (`brew install anthropic/tap/claude`) — subscribe to Claude Max 20×
 - **Codex CLI** — subscribe to Codex Pro 20× or similar
 
 ### Minimum
 
-One of the above at a paid tier sufficient for sustained multi-agent runs.
+OpenCode with API credits, or one of Claude Code / Codex CLI at a paid tier, sufficient for sustained multi-agent runs.
+
+### Also fully supported
+
+- [Gemini CLI](https://github.com/google-gemini/gemini-cli) — `provider = "gemini"`
 
 ### Others (compatibility not guaranteed)
 
-- [Gemini CLI](https://github.com/google-gemini/gemini-cli)
-- [OpenCode](https://github.com/opencode-ai/opencode)
 - [GitHub Copilot CLI](https://docs.github.com/en/copilot/github-copilot-in-the-cli)
 - [Cursor](https://www.cursor.com/) (agents mode)
 
 For the authoritative list of providers Gas City natively supports — along with the `provider = "..."` value to put in `city.toml` — see [`internal/config/provider.go#L203-L209`](https://github.com/gastownhall/gascity/blob/73f09ddd78fed9b90e0589b324255c36d030eb46/internal/config/provider.go#L203-L209) in the Gas City source.
+
+### Telling your factory which agent to use
+
+Whichever agent you pick, name it once in your city configuration. **The shipped
+default is OpenCode**, so if you are using a different agent you must change this.
+After you copy the templates (see the Quickstart in [`README.md`](README.md)), edit
+`my-factory/city.toml`:
+
+```toml
+[workspace]
+name = "my-factory"
+provider = "opencode"        # or "claude", "codex", "gemini", ...
+
+[providers.opencode]         # must name the same provider as above
+base = "builtin:opencode"
+```
+
+Every agent in the factory inherits `provider`, so changing it switches the whole
+pipeline. Gas City also needs the matching `[providers.<name>]` catalog entry —
+`gc doctor --fix` adds it for you, and the template ships it so the config validates
+before you run doctor. Change both together.
+
+You can override the provider for a single agent by setting `provider` in that
+agent's `agent.toml`, which is how you would run, say, the reviewer on a different
+model than the builder.
+
+Note that `[session] provider` is a different setting — it selects where sessions
+run (`tmux`, `k8s`), not which agent CLI to use. Check what actually resolved with:
+
+```bash
+gc config explain --agent <agent-name>
+```
 
 ---
 

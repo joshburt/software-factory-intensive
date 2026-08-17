@@ -11,5 +11,5 @@ docs = [
 
 # L1 has no formula steps — it is a setup-only lesson.
 # The walkthrough validates: CLAUDE.md exists, PROJECT_MANIFEST.md created,
-# city.toml enables FormulaV2, pack.toml selects L2, gc register + rig add
+# city.toml enables FormulaV2 and selects L2, gc register + rig add
 # succeed, and project tests pass.

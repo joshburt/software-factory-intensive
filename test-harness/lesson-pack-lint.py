@@ -7,10 +7,14 @@ import argparse
 import json
 import re
 import sys
-import tomllib
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
+
+try:
+    import tomllib  # Python 3.11+
+except ModuleNotFoundError:
+    import tomli as tomllib  # pragma: no cover — Python <3.11 fallback
 
 
 CONTRACT_DIR = Path(__file__).with_name("lesson-contracts")
@@ -196,7 +200,24 @@ def check_root_factory(root: Path, findings: list[Finding]) -> None:
                 "city config still uses default_rig_includes",
                 root=root,
                 line=line_number(text, "default_rig_includes"),
-                hint="move active lesson selection to my-factory/pack.toml [defaults.rig.imports.factory]",
+                hint="move active lesson selection to my-factory/city.toml [defaults.rig.imports.factory]",
+            )
+        # Gas City 1.4.x rejects [defaults.rig.imports] inside pack.toml; it
+        # belongs in city.toml. See vault/Decisions/ADR-003.
+        factory = (
+            data.get("defaults", {})
+            .get("rig", {})
+            .get("imports", {})
+            .get("factory")
+        )
+        if not isinstance(factory, dict) or "../packs/lessons/" not in str(factory.get("source", "")):
+            add(
+                findings,
+                "SFI112",
+                path,
+                "city config does not define the active factory default rig import",
+                root=root,
+                hint='expected [defaults.rig.imports.factory] source = "../packs/lessons/<lesson>" in city.toml',
             )
 
     pack_files = [root / "my-factory" / "pack.toml.template", root / "my-factory" / "pack.toml"]
@@ -210,21 +231,6 @@ def check_root_factory(root: Path, findings: list[Finding]) -> None:
         except tomllib.TOMLDecodeError as exc:
             add(findings, "SFI111", path, f"root pack config is not valid TOML: {exc}", root=root)
             continue
-        factory = (
-            data.get("defaults", {})
-            .get("rig", {})
-            .get("imports", {})
-            .get("factory")
-        )
-        if not isinstance(factory, dict) or "../packs/lessons/" not in str(factory.get("source", "")):
-            add(
-                findings,
-                "SFI112",
-                path,
-                "root pack does not define the active factory default rig import",
-                root=root,
-                hint='expected [defaults.rig.imports.factory] source = "../packs/lessons/<lesson>"',
-            )
         imports = data.get("imports", {})
         if "all" in imports:
             add(

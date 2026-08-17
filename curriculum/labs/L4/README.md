@@ -21,7 +21,8 @@
           │  docs/reviews/       │
           │  <slug>.md           │
           └──────────┬───────────┘
-                     │  verdict: APPROVE (else loop back to Coder)
+                     │  verdict recorded (PASS/FAIL) — the graph does not
+                     │  branch on it; you re-run manually on FAIL
                      ▼
           ┌──────────────────────┐
           │  DevOps   (L4)       │  ← reads: PROJECT_MANIFEST.md
@@ -43,7 +44,7 @@ L4 keeps the same process shape as L3 and adds two downstream evidence steps:
 plan -> architecture -> design -> build -> review -> release gate
 ```
 
-The factory pack is selected in `my-factory/pack.toml`:
+The factory pack is selected in `my-factory/city.toml`:
 
 ```toml
 [defaults.rig.imports.factory]
@@ -82,13 +83,9 @@ formula_v2 = true
 
 ## 2. Select the L4 Factory Pack
 
-Edit `my-factory/pack.toml`:
+Edit `my-factory/city.toml`:
 
 ```toml
-[pack]
-name = "my-factory"
-schema = 2
-
 [defaults.rig.imports.factory]
 source = "../packs/lessons/L4"
 ```

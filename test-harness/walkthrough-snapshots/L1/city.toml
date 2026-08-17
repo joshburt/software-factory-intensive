@@ -1,8 +1,20 @@
 [workspace]
-provider = "claude"
+provider = "opencode"
+
+[providers]
+[providers.opencode]
+base = "builtin:opencode"
+ready_delay_ms = 0
+
+[defaults]
+[defaults.rig]
+[defaults.rig.imports]
+[defaults.rig.imports.factory]
+source = "../packs/lessons/L2"
 
 [[rigs]]
 name = "rig"
+default_branch = "main"
 [rigs.imports]
 [rigs.imports.factory]
 source = "../packs/lessons/L2"

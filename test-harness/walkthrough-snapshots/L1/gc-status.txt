@@ -1,25 +1,28 @@
-sfi-walkthrough-L1-1777182953-17308  /private/tmp/sfi-tutorial-walkthrough/1777182953-17296/L1/my-factory
-  Controller: supervisor-managed (PID 61570)
-  Authority: supervisor process PID 61570
+2026/08/17 14:06:35 tmux state cache: refresh failed in 5.357166ms: runtime unavailable: liveness observation failed: no tmux server running
+sfi-walkthrough-L1-1787000741-6338  /private/tmp/sfi-tutorial-walkthrough/1787000741-6325/L1/my-factory
+  Controller: supervisor-managed (PID 15463)
+  API:        http://127.0.0.1:8372
+  Authority: supervisor process PID 15463
   Suspended:  no
 
 Agents:
-  dog                     scaled (min=0, max=3)
-    dog-1                 stopped
-    dog-2                 stopped
-    dog-3                 stopped
-  rig/factory.architect   stopped
-  rig/factory.planner     stopped
-  control-dispatcher      running
-  rig/control-dispatcher  stopped
+  bd.dog                  scaled (min=0, max=2)
+    bd.dog-1              stopped
+    bd.dog-2              stopped
+  core.control-dispatcher stopped
+  rig/core.control-dispatcherstopped
+  rig/factory.architect   scaled (min=0, max=1)
+    rig/factory.architect stopped
+  rig/factory.planner     scaled (min=0, max=1)
+    rig/factory.planner   stopped
 
-1/7 agents running
-
-Named sessions:
-  control-dispatcher      awake (always)
-  rig/control-dispatcher  creating (always)
+0/6 agents running
 
 Rigs:
-  rig                     /private/tmp/sfi-tutorial-walkthrough/1777182953-17296/L1/rig
+  rig                     /private/tmp/sfi-tutorial-walkthrough/1787000741-6325/L1/rig
 
-Sessions: 1 active, 0 suspended
+Store health:
+  Path:        /private/tmp/sfi-tutorial-walkthrough/1787000741-6325/L1/my-factory/.beads/dolt
+  Size:        3.9 MB
+  Live rows:   16
+  Ratio:       0.2 MB/row  (threshold 1.0 MB/row)

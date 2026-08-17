@@ -99,13 +99,9 @@ formula_v2 = true
 
 ## 2. Select the L3 Factory Pack
 
-Edit `my-factory/pack.toml` so the active factory import points at L3:
+Edit `my-factory/city.toml` so the active factory import points at L3:
 
 ```toml
-[pack]
-name = "my-factory"
-schema = 2
-
 [defaults.rig.imports.factory]
 source = "../packs/lessons/L3"
 ```

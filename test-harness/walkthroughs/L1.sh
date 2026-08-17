@@ -120,10 +120,11 @@ MANIFEST
     fail "L1 step 3 failed: FormulaV2 not enabled"
   fi
 
-  if grep -q 'packs/lessons/L2' "$WALK_L1_FACTORY/pack.toml"; then
-    step_pass "pack.toml selects packs/lessons/L2"
+  # Rig imports live in city.toml on Gas City 1.4.x; pack.toml is rejected.
+  if grep -q 'packs/lessons/L2' "$WALK_L1_FACTORY/city.toml"; then
+    step_pass "city.toml selects packs/lessons/L2"
   else
-    step_fail "pack.toml.template does not select L2 — README claims it does"
+    step_fail "city.toml.template does not select L2 — README claims it does"
     fail "L1 step 3 failed: wrong pack selection"
   fi
 

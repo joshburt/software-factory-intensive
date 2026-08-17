@@ -1,7 +1,111 @@
 <!--
 SYNC IMPACT REPORT — Constitution Amendment
-Version change: 1.0.0 → 1.1.0 (MINOR: new articles + materially expanded guidance)
+Version change: 1.2.0 → 1.3.0 (MINOR: new governance mechanism)
 Date: 2026-08-17
+Rationale: DEFECT-B3 (orphaned release-gate verdict, Article XIII) cannot be fixed in
+  this change — the correct fix touches shipped pack formulas and requires live
+  walkthrough re-verification, which is a separate, larger effort already underway
+  (the Gas City 1.4.x schema migration). Ratifying this constitution's Governance
+  section without acknowledging that violation would be exactly the "silent dilution"
+  Compliance already forbids. A generic escape hatch was rejected in favor of a
+  narrowly-scoped, mandatory-fields, dated exception mechanism, so that any future
+  exception is itself auditable rather than a loophole.
+Added sections:
+  - Governance → Transitional Exceptions: a bounded exception mechanism. Every entry
+    must name the defect, the article violated, why it can't be fixed in the same
+    change, and a concrete expiry condition (no open-ended exceptions permitted).
+    Seeded with DEFECT-B3, expiring when the affected formulas branch on the verdict
+    or declare it advisory-only.
+Removed sections: none
+Templates / docs propagated:
+  - ✅ curriculum/SOFTWARE_FACTORY_MANIFEST_TEMPLATE.md — added a disclosure note under
+    Human Gates: the shipped lesson packs do not implement these as automated
+    stop-and-wait steps (resolves DEFECT-B1's Article XIV clause 3 requirement)
+  - ✅ curriculum/labs/L4/README.md — architecture diagram corrected; no longer claims
+    an "else loop back to Coder" edge that no formula implements (resolves DEFECT-B3's
+    Article IV half; the Article XIII half is the Transitional Exception above)
+  - ✅ test-harness/lesson-pack-lint.py — fixed a stale check (SFI112) that asserted
+    rig imports belong in pack.toml; also fixed a crash on Python <3.11 (missing
+    tomllib) that was silently breaking the pre-commit hook's smoke-test rung
+  - ⚠ .specify/templates/plan-template.md — no change (Article XIII gate row already
+    covers "every verdict has a consequence or is advisory-only"; this amendment adds
+    a governance mechanism, not a new article)
+Follow-up TODOs: none new; TODO(DEFECT-B3) from v1.2.0 is now tracked via the
+  Transitional Exception's expiry condition instead of a bare TODO.
+-->
+
+<!--
+SUPERSEDED SYNC IMPACT REPORT — v1.1.0 → 1.2.0 (retained for amendment history)
+Version change: 1.1.0 → 1.2.0 (MINOR: new article + corrected workflow + expanded guidance)
+Date: 2026-08-17
+Rationale: two corrections and one addition. (1) The Development Workflow section stated an
+  incomplete Spec Kit flow — it omitted `speckit.implement` and the `speckit.converge` loop
+  entirely, and did not acknowledge the human review gates already defined in
+  .specify/workflows/speckit/workflow.yml. (2) Maintainer reasoning had no durable home:
+  the governance decisions and the two defects found during the v1.1.0 audit existed only
+  in an HTML comment and a chat transcript. A survey of the three reference factories
+  (darkharbour, anvil, oldgrowth) found all three independently converged on the same
+  memory mechanics, so the convergent core was adopted and the per-repo ceremony (3-tier
+  MOCs, 1500-line articles) was deliberately left out as disproportionate here.
+Modified principles:
+  - Development Workflow & Quality Gates: Spec Kit flow corrected to the full ordered
+    pipeline `specify → clarify → plan → tasks → analyze → implement ⇄ converge`, with the
+    implement/converge loop stated as a termination condition; the workflow.yml
+    `review-spec` / `review-plan` human gates are now named and protected from removal.
+  - Additional Constraints: the Beads bullet now states the bd-vs-vault division of labor.
+Added sections:
+  - Article XV — Durable Project Memory. Ported convergent core from all three reference
+    factories: three record types (Decisions/Discoveries/Sessions), the
+    draft→reviewed→canonical lifecycle with canonical human-only, required frontmatter
+    {title,type,tags,created,updated}, controlled tag vocabulary in vault/_meta/tags.md,
+    write-as-you-go with an end-of-round enrichment pass, notes ship in the PR, nothing
+    invented, flag conflicts rather than resolving silently, stale worse than missing, and
+    the bd/vault/constitution division of labor.
+Deliberately NOT ported (disproportionate for a 9-session curriculum):
+  - oldgrowth's 3-tier Maps of Content (folder/domain/concept MOCs) and its ~250-line
+    vault article — this repo has no note volume to justify a MOC hierarchy.
+  - A mechanical vault audit script (darkharbour's tools/vault_health, anvil's
+    make vault-audit). Warranted eventually; it is code, so it is out of scope for the
+    constitution workflow and is tracked as TODO(ENFORCE-XV).
+Removed sections: none
+Templates / docs propagated:
+  - ✅ AGENTS.md — CREATED. First repo-level agent guidance; operationalizes Articles I–XV
+    for agent sessions. Follows the reference-repo pattern of a terse constitution plus a
+    detailed operational companion that defers to it on all normative questions.
+  - ✅ vault/ — CREATED. index.md, _meta/tags.md, Decisions/, Discoveries/, Sessions/,
+    seeded with the decision records and discoveries produced during this work round.
+  - ✅ .specify/templates/plan-template.md — Constitution Check gate table extended from
+    14 to 15 rows for Article XV
+  - ⚠ .specify/templates/spec-template.md — no change (no constitution references)
+  - ⚠ .specify/templates/tasks-template.md — no change (no constitution references)
+  - ⚠ .specify/templates/checklist-template.md — no change (no constitution references)
+  - ⚠ .opencode/commands/speckit.*.md — no change (all 10 files agent-neutral)
+  - ⚠ .specify/workflows/speckit/workflow.yml — no change; it is now CITED by the
+    Development Workflow section as the source of the repo's own human review gates. Note
+    it implements a reduced pipeline (specify → gate → plan → gate → tasks → implement) and
+    does not itself invoke clarify, analyze, or converge; those are invoked directly.
+  - ⚠ README.md — no change (student-facing; the vault is maintainer infrastructure and
+    per Article V MUST NOT appear in student-facing content)
+Follow-up TODOs (carried forward from v1.1.0, plus one new):
+  - TODO(ENFORCE-XV): add a vault audit (frontmatter fields, tag vocabulary, ISO dates,
+    broken wikilinks, orphans) wired into .githooks/pre-commit, modeled on darkharbour's
+    tools/vault_health/audit.py
+  - TODO(ENFORCE-XI): lint check asserting each agent prompt names its authoritative
+    manifest section
+  - TODO(ENFORCE-XII): lesson-contract fields asserting per-step close condition and
+    failure behavior
+  - TODO(ENFORCE-XIII): lint check flagging a verdict-producing step whose verdict has no
+    graph consequence and no advisory-only declaration
+  - TODO(ENFORCE-XIV): text-consistency check flagging curriculum that teaches a human gate
+    without a corresponding pack capability or an explicit omission note
+  - TODO(DEFECT-B1): curriculum teaches two Human Gates that no shipped pack implements —
+    see vault/Discoveries/2026-08-17-human-gates-taught-not-shipped.md
+  - TODO(DEFECT-B3): L4 README promises a loop-back edge that no formula has, and the
+    release-gate verdict has no consumer — see
+    vault/Discoveries/2026-08-17-release-gate-verdict-has-no-consumer.md
+-->
+<!--
+SUPERSEDED SYNC IMPACT REPORT — v1.0.0 → 1.1.0 (retained for amendment history)
 Rationale: v1.0.0 derived Articles I–X exclusively from mechanically enforced
   practice (lint, hooks, harness scripts, skills). A subsequent audit of the
   workshop curriculum (W1–W4), the three curriculum/*_TEMPLATE.md manifest
@@ -372,6 +476,47 @@ whether the material is honest about the reference factory's limits. A curriculu
 teaches gates while shipping an exemplar without them teaches, in practice, that gates
 are optional — because students copy the exemplar, not the prose.
 
+### Article XV — Durable Project Memory
+
+Maintainer knowledge about why this curriculum is shaped the way it is MUST outlive the
+session that produced it. The vault at `vault/` is that record.
+
+- **Three record types, written where they belong.** Curriculum-design and architectural
+  decisions with stated reasons → `vault/Decisions/` as `ADR-NNN-Descriptive-Title.md`.
+  Non-obvious constraints, gaps, and taught-vs-shipped conflicts → `vault/Discoveries/`.
+  Work-round summaries → `vault/Sessions/` as `YYYY-MM-DD-topic.md`, append-only.
+- **Write as work happens, never in batches at the end.** A decision recorded after the
+  fact is a reconstruction. At the end of a work round, do an enrichment pass: add the
+  session note, promote verified drafts, and confirm every decision made has a note.
+- **Vault notes ship with the change.** A pull request that made a decision or hit a
+  non-obvious constraint MUST include the corresponding note in the same changeset.
+- **Status lifecycle.** Agent-authored notes start at `status: draft`, `source: agent`. An
+  agent MAY self-promote to `reviewed` after verifying the note's claims in that same
+  session. An agent MUST NEVER set `canonical` — that is a human-only action.
+- **Required frontmatter.** Every note MUST carry `title`, `type`, `tags`, `created`, and
+  `updated`, with ISO dates and `updated` bumped on every edit. Tags MUST come from
+  `vault/_meta/tags.md`; introducing a new tag requires updating that file first.
+- **Nothing is invented.** Every claim MUST trace to a source — a file, a command output, a
+  commit, or a decision made in the recorded session. Genuine gaps are marked
+  `> [!question] UNDOCUMENTED`.
+- **Flag conflicts; do not resolve them silently.** Where sources disagree, record
+  `> [!attention] CONFLICT` describing both sides.
+- **A stale note is worse than a missing one.** A note that can no longer be verified MUST
+  be marked `> [!warning] STALE` rather than left standing as if current.
+- **Division of labor.** Work items and status live in Beads (`bd`) — never in markdown
+  TODO lists. Reasoning, constraints, and history live in the vault. Governance rules live
+  in this constitution. No loose `MEMORY.md` files.
+- **The vault is maintainer infrastructure.** It is not student-facing curriculum, and
+  Article V applies to it: no vault path may appear in student-facing content.
+
+**Rationale:** this repository's decisions are unusually easy to lose. Commit messages are
+terse, the reasoning behind a curriculum choice rarely survives in the diff, and a
+taught-vs-shipped defect found by cross-checking is invisible to the next maintainer unless
+it is written down. Every reference factory in this ecosystem independently converged on the
+same three record types and the same draft/reviewed/canonical lifecycle; adopting that
+convergent core costs little and stops decisions from being re-litigated and gotchas from
+being re-discovered.
+
 ## Additional Constraints
 
 - **Secrets never touch git.** Credential material is denied by default in `.gitignore`
@@ -380,8 +525,10 @@ are optional — because students copy the exemplar, not the prose.
   negation entry. Secrets MUST NOT appear in curriculum text, snapshots, or transcripts.
 - **Local state stays local.** Per-checkout Beads/Dolt state (`/.beads/`, except its
   `README.md`) and generated `my-factory/` runtime configuration are not git-tracked.
-- **Durable work is tracked in Beads.** Project work belongs in `bd`, not in ad-hoc
-  markdown TODO lists or loose memory files.
+- **Durable work is tracked in Beads; durable reasoning is tracked in the vault.** Work
+  items and status belong in `bd`, not in ad-hoc markdown TODO lists. Decisions,
+  constraints, and session history belong in `vault/` per Article XV. Neither belongs in a
+  loose `MEMORY.md`.
 - **Snapshots are evidence.** Files under `test-harness/walkthrough-snapshots/**` are
   harvested output, not hand-authored prose. They MUST be regenerated by a run, never
   edited to produce a desired result.
@@ -395,9 +542,20 @@ are optional — because students copy the exemplar, not the prose.
 
 ## Development Workflow & Quality Gates
 
-- **Spec Kit flow** for non-trivial features: `speckit.specify` → `speckit.clarify` (when
-  ambiguous) → `speckit.plan` → `speckit.tasks` → `speckit.analyze` → implement. Plans
-  MUST include a Constitution Check that gates Phase 0 and is re-checked after design.
+- **Spec Kit flow** for non-trivial features, in order:
+  `speckit.specify` → `speckit.clarify` → `speckit.plan` → `speckit.tasks` →
+  `speckit.analyze` → `speckit.implement` ⇄ `speckit.converge`.
+  `speckit.implement` and `speckit.converge` form a loop: `converge` assesses the codebase
+  against the spec, plan, and tasks and appends remaining unbuilt work to `tasks.md` so
+  `implement` can finish it. The loop MUST run until `converge` finds no remaining work —
+  a feature is not done while `converge` still appends tasks.
+- **Plans MUST include a Constitution Check** that gates Phase 0 and is re-checked after
+  design. Accepted violations MUST be recorded in the plan's Complexity Tracking table.
+- **The `speckit.specify` and `speckit.plan` review gates are human gates.** The bundled
+  workflow at `.specify/workflows/speckit/workflow.yml` defines `review-spec` and
+  `review-plan` gate steps with `on_reject: abort`. These MUST NOT be removed or
+  auto-approved; they are the Article XIV human-authority checkpoints of this repository's
+  own development process.
 - **Pre-commit scope map** (`.githooks/pre-commit`): pack and hook changes trigger
   structural and behavioral checks; student command-path and harness changes additionally
   trigger the dry-run command flow; curriculum-only Markdown changes skip the mechanical
@@ -439,4 +597,25 @@ Amendments are proposed via a pull request that touches this file and MUST inclu
 
 Agents MUST NOT weaken, dilute, or bypass a principle in order to make work pass.
 
-**Version**: 1.1.0 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-17
+### Transitional Exceptions
+
+An exception recorded here is not a general escape hatch. It MUST name a specific
+defect, the article it violates, why the defect cannot be fixed in the same change
+that ratifies or amends this constitution, and a concrete condition under which it
+expires. An exception with no expiry condition is not permitted. Deleting the
+teaching that exposes a defect is never an acceptable resolution (Article XIV).
+
+- **DEFECT-B3 — orphaned release-gate verdict (Article XIII).** The `release-gate`
+  step in `packs/lessons/L4` and `packs/lessons/C1` renders a PASS/FAIL verdict that
+  the formula graph does not act on; the run's outcome is the same either way. Article
+  XIII requires a verdict-producing step to have a defined graph consequence or be
+  declared advisory-only. Fixing this correctly means changing a shipped pack's
+  formula and re-verifying it against a live walkthrough, which is out of scope for a
+  constitution amendment. Recorded here rather than silently ratified over.
+  **Expires** when `packs/lessons/L4/formulas/mol-delivery-review.toml` and
+  `packs/lessons/C1/formulas/mol-release-delivery.toml` either branch on the verdict
+  or declare it advisory-only in the pack, whichever comes first — expected within
+  this repository's current Gas City 1.4.x schema migration. See
+  `vault/Discoveries/2026-08-17-release-gate-verdict-has-no-consumer.md`.
+
+**Version**: 1.3.0 | **Ratified**: 2026-08-17 | **Last Amended**: 2026-08-17

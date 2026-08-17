@@ -519,16 +519,33 @@ purge_stranded_walkthrough_cities() {
 # Verify the tools a live-agent walkthrough needs.
 assert_walkthrough_preflight() {
   assert_gc_version_ge_015
-  if command -v claude >/dev/null 2>&1; then
-    step_pass "claude CLI on PATH ($(command -v claude))"
+  # Must match the provider the lesson configs write, and the shipped default in
+  # my-factory/city.toml.template. Override with WALK_PROVIDER to test another.
+  local provider="${WALK_PROVIDER:-opencode}"
+  if command -v "$provider" >/dev/null 2>&1; then
+    step_pass "$provider CLI on PATH ($(command -v "$provider"))"
   else
-    step_fail "claude CLI not on PATH — install Claude Code before running"
+    step_fail "$provider CLI not on PATH — install it before running"
   fi
-  if claude auth status >/dev/null 2>&1; then
-    step_pass "claude CLI authenticated"
-  else
-    step_fail "claude CLI not authenticated — run 'claude auth login'"
-  fi
+  case "$provider" in
+    claude)
+      if claude auth status >/dev/null 2>&1; then
+        step_pass "claude CLI authenticated"
+      else
+        step_fail "claude CLI not authenticated — run 'claude auth login'"
+      fi
+      ;;
+    opencode)
+      if opencode auth list 2>/dev/null | grep -qi 'credential'; then
+        step_pass "opencode CLI authenticated"
+      else
+        step_fail "opencode CLI not authenticated — run 'opencode auth login'"
+      fi
+      ;;
+    *)
+      step_pass "$provider auth probe not implemented — skipping"
+      ;;
+  esac
   local tool
   for tool in jq tmux git bd; do
     if command -v "$tool" >/dev/null 2>&1; then

@@ -5,7 +5,7 @@
 L3 switches the active factory pack to `packs/lessons/L3`, then runs one
 formula graph through Planner, Architect, Designer, and Builder.
 
-Factory selection in `my-factory/pack.toml`:
+Factory selection in `my-factory/city.toml`:
 
 ```toml
 [defaults.rig.imports.factory]

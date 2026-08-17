@@ -102,7 +102,7 @@ Confirm `my-factory/city.toml` has formula v2 enabled:
 formula_v2 = true
 ```
 
-The default `my-factory/pack.toml` selects the first runnable lesson factory:
+The default `my-factory/city.toml` selects the first runnable lesson factory:
 
 ```toml
 [defaults.rig.imports.factory]
@@ -155,7 +155,7 @@ If a command fails, fix your agent instruction file (ex. `CLAUDE.md`) before mov
 - [ ] The relevant agent instruction file (ex. `CLAUDE.md` for Claude Code, `AGENTS.md` for OpenCode/Codex CLI/etc.) exists in the project rig with project-specific rules.
 - [ ] `~/path/to/your-project/docs/PROJECT_MANIFEST.md` exists with overview, tech stack, and project structure.
 - [ ] `my-factory/city.toml` enables formula v2.
-- [ ] `my-factory/pack.toml` selects `../packs/lessons/L2` as `factory`.
+- [ ] `my-factory/city.toml` selects `../packs/lessons/L2` as `factory`.
 - [ ] `gc status` (run from `my-factory/`) shows your city and project rig.
 
 ## Next
