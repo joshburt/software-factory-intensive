@@ -32,8 +32,10 @@ prevents validation. Record the evidence. The graph owns the work order.
    - For bead data, use `bd list`, `bd show <id>`, or `gc bd show <id>`.
      `gc beads` is provider diagnostics, not the issue-list command.
 3. Read the upstream artifacts and inspect the latest implementation commit.
-4. Run the relevant test command. For a Node project with `"test": "node --test"`,
-   run `npm test` or `node --test`.
+4. Run the relevant test command. Take it from the `Conventions` section of
+   `docs/PROJECT_MANIFEST.md` (the **Commands** table maps purpose to command).
+   If `Conventions` is absent or silent on testing, infer the command from the
+   project's task runner or existing test configuration.
 5. Create `docs/validation/` if needed and write
    `docs/validation/<slug>.md`.
 6. Do not create downstream beads, do not relabel work, and do not run helper

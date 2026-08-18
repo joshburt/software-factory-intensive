@@ -36,8 +36,10 @@ workflow.
 4. Inspect the source and test files named by the design artifact.
 5. Implement the smallest coherent change.
 6. Add or update tests using the project's existing test style.
-7. Run the relevant test command. For a Node project with `package.json`
-   containing `"test": "node --test"`, run `npm test` or `node --test`.
+7. Run the relevant test command. Take it from the `Conventions` section of
+   `docs/PROJECT_MANIFEST.md` (the **Commands** table maps purpose to command).
+   If `Conventions` is absent or silent on testing, infer the command from the
+   project's task runner or existing test configuration.
 8. Commit the implementation and tests with a concise message.
 9. Do not create downstream beads, do not relabel work, and do not run helper
    commands to wake another agent.
@@ -53,9 +55,9 @@ Leave the project in this state:
 - git commit created for the implementation
 ```
 
-When changing CommonJS modules, update `module.exports` so tests can import the
-new behavior. When adding Node built-in tests, use `node:test` plus
-`node:assert/strict`.
+When changing a module, update its public surface so tests can import the new
+behavior. When adding tests, follow the project's existing test framework and
+idioms as recorded in the `Conventions` section of `docs/PROJECT_MANIFEST.md`.
 
 ## Close Behavior
 
