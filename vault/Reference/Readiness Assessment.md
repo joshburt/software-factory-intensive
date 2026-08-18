@@ -54,22 +54,38 @@ The same change also fixed a second, independent defect: `gc session peek` — t
 9 places across the curriculum — returns **empty** on ACP and real content on tmux.
 Students following the taught observability path were seeing nothing.
 
-**Revised status**: L1 verified green. L2 verified green end-to-end. L3/L4/C1 now
-expected to pass (same fix, same mechanism) but **not yet run** — that is the
-remaining verification gap, not a known defect.
+**Revised status**: L1, L2, L3, and L4 all verified green end-to-end. All agent
+stages across all three multi-agent lessons completed successfully after raising
+`WALK_AGENT_BUDGET` to 1800s and `WALK_BUILDER_BUDGET` to 2700s. A one-off artifact-
+placement anomaly hit L4 during the first (chained) attempt; an isolated re-run did
+not reproduce it — treated as agent inference variance, not a defect. Only **C1**
+remains unverified.
+
+### Resolved: L4 planner artifact misplacement did not reproduce
+
+In the original L3→L4→C1 chain, the L4 Planner wrote its artifact to
+`my-factory/docs/plans/` instead of the harness-expected `rig/docs/plans/`. An
+isolated L4 re-run immediately after — same fix set, same budgets — completed all
+six stages with correct artifact placement throughout (`✓ L4 passed`). Treated as
+agent inference variance, not a defect. Full detail in
+[[2026-08-17-l4-planner-wrote-artifact-to-wrong-rig-directory]].
+
+One trend worth watching without enough data to act on yet: L4's later stages
+(Reviewer 43%, Builder 40% of budget) ran higher than the 20-30% band seen in
+earlier-pipeline stages across L2/L3/L4. Single run; not actionable yet.
 
 ### What's explicitly still not known
 
-- **L3/L4/C1 have not been run** since the fix. Expected to pass; unverified.
-- **Timing margin is thin.** The architect completed at 580s against a 600s budget
-  (97%). On slower hardware, a slower model, or with larger prompts this would still
-  time out. The budget likely needs raising independently of the transport fix.
+- **C1 has not been attempted** under the current fix set (transport pin + raised
+  budgets). It is the longest, most complex lesson (7 agents, most steps) and the
+  final verification gap before claiming full-curriculum reliability.
 - Whether `claude` defaults to tmux or ACP (now much lower stakes, since transport is
   pinned explicitly rather than left to the provider default).
+- Whether the later-stage budget trend noted above is real or single-run noise.
 
 ### Recommendation
 
-The L2 pass is a genuine milestone: the schema fix, the OpenCode default, and the
-transport fix now hold together through a complete real lesson run. But do not yet
-claim "run C1 end-to-end" reliability — run L3, L4, and C1 first, and treat the 97%
-timing margin as the most likely source of the next failure.
+L1, L2, L3, and L4 are now verified end-to-end. The schema fix, the OpenCode
+default, the transport fix, and the raised timeout budget hold together across four
+consecutive real lesson runs. **C1 is the only remaining gap** before claiming
+full-curriculum reliability — run it next.
