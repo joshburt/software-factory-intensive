@@ -127,10 +127,23 @@ The `UNDOCUMENTED` question above still stands: whether the key is strictly *req
 is unresolved. It is now known to be *correct*, which is a weaker but sufficient basis
 for shipping it.
 
-> [!warning] STALE
-> The Article IV reconciliation this change requires has NOT been completed. The L1
-> snapshot could not be regenerated because the walkthrough fails for an unrelated,
-> pre-existing reason — see
-> `2026-08-17-quickstart-broken-pack-toml-rig-imports.md`. Until that defect is
-> resolved and `tutorial-walkthrough.sh L1` passes, the template edit and the L1
-> snapshot are knowingly out of sync. Do not resolve this by editing the snapshot.
+**Resolved (same session, later):** the `L1` blocker referenced below was fixed
+(ADR-003 schema migration); `tutorial-walkthrough.sh L1` now passes and its
+snapshot is current.
+
+The original `UNDOCUMENTED` question — whether `install_agent_hooks` is strictly
+required for the OpenCode plugin to install — is now answered empirically, not just
+by inference from `gc init` output. Three live runs (L2 ×2, L3) all showed
+`.opencode/plugins/gascity.js` present on disk with **no `install_agent_hooks` key
+set anywhere** — not at workspace level (removed from `city.toml.template` this
+session as deprecated) and not per-agent (never added to any `agent.toml`). `gc`
+installs the provider's lifecycle hook automatically when the builtin provider
+profile declares `SupportsHooks: true`, independent of this key. See
+`vault/Discoveries/2026-08-17-architect-role-session-lifecycle-desync.md` for the
+full live-run evidence.
+
+**Conclusion:** do not add `install_agent_hooks` to the 19 lesson-pack `agent.toml`
+files (P3, considered and closed). There is no evidence it is needed, and adding it
+would be exactly the kind of unjustified, unverified config change Article XI
+(Simplicity First) in the sibling repos' constitutions — and this repo's own minimum
+-change discipline — warns against.

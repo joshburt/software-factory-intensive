@@ -54,6 +54,20 @@ OpenCode-specific reliability or throughput problem under sustained multi-agent 
 that is the revisit trigger below, and the Recommended promotion should be reverted
 or qualified before this ADR is considered settled rather than provisional.
 
+**Update after live runs (same session):** L2 (×2) and L3 were run live. All three
+independently prove the parts this ADR is actually about: `gc register`, rig sync,
+`factory up`, and the first agent's full execution all succeeded on OpenCode across
+two different lesson packs. None reached completion, though — all three hit a
+reproducible `gc`-internal session-handoff defect at the second agent in the chain
+(see `vault/Discoveries/2026-08-17-architect-role-session-lifecycle-desync.md`). That
+defect's signature is provider-silent (plain tmux session bookkeeping, no OpenCode or
+plugin reference) and its common factor is chain position, not role or provider
+identity — so it does **not** meet this ADR's revisit-trigger bar of an
+"OpenCode-specific" problem, and the Recommended promotion stands. L4 and C1 were not
+run; see the discovery note for why continuing was not the best use of further
+live-run budget. This ADR remains formally provisional pending a `claude`-provider
+comparison run, which would be the deciding evidence either way.
+
 ## Consequences
 
 - **Easier**: `installation.md`'s Recommended section and the shipped template agree.
@@ -89,8 +103,14 @@ supports.
 
 ## Revisit Trigger
 
-Revisit immediately if any of the live L2/L3/L4/C1 walkthrough runs (queued this
-session) fail on the OpenCode provider for a reason attributable to OpenCode itself
-(rate limits, model reliability, missing hook behavior) rather than to the schema
-migration being validated. If that happens, downgrade OpenCode's `installation.md`
-tier back to "Also fully supported" and record the failure mode here.
+Revisit immediately if any live walkthrough run fails on the OpenCode provider for a
+reason attributable to OpenCode itself (rate limits, model reliability, missing hook
+behavior) rather than to the schema migration being validated, or to a provider-agnostic
+`gc` defect. If that happens, downgrade OpenCode's `installation.md` tier back to
+"Also fully supported" and record the failure mode here.
+
+The session-handoff defect found this session did not meet this bar (see the Update
+above) but came close enough that it should be resolved, not left ambiguous. Revisit
+this ADR immediately if a future `claude`-provider comparison run does *not* reproduce
+the same handoff defect — that would newly implicate OpenCode specifically and this
+promotion should be reverted at that point.

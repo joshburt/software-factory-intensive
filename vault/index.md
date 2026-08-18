@@ -27,6 +27,7 @@ Governed by **Article XV — Durable Project Memory** in
 | `Decisions/` | Curriculum-design and architectural decisions, as `ADR-NNN-Title.md` | A decision is made with stated reasons |
 | `Discoveries/` | Non-obvious constraints, gaps, taught-vs-shipped conflicts | Something cost discovery time, or sources disagree |
 | `Sessions/` | Work-round summaries, `YYYY-MM-DD-topic.md`, append-only | A work round concludes |
+| `Reference/` | Dated assessments, guides, research corpus | A finding needs a durable home that isn't a decision, a discovery, or a session |
 | `_meta/tags.md` | The controlled tag vocabulary | A genuinely new tag is needed |
 
 ## Where else truth lives
@@ -49,3 +50,7 @@ Governed by **Article XV — Durable Project Memory** in
 
 Defects found and not yet resolved are tracked as `TODO(DEFECT-*)` in the
 constitution's Sync Impact Report, each linked to a note in `Discoveries/`.
+
+Defects in dependencies we do not control — and the local workarounds standing in for
+them — are tracked in [[Upstream Issues]]. Check that file before removing any
+workaround, and re-run its detection tests after adopting a new `gc` or `bd` release.
