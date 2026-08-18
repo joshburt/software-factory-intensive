@@ -6,14 +6,8 @@ set -uo pipefail
 source "$WALK_REPO_ROOT/test-harness/walkthroughs/_common.sh"
 
 lesson_prerequisites_check() {
-  if ! command -v node >/dev/null 2>&1; then
-    echo "L3: node not on PATH" >&2
-    return 1
-  fi
-  local node_major
-  node_major="$(node -v | sed -E 's/^v([0-9]+).*/\1/')"
-  if [ "${node_major:-0}" -lt 18 ]; then
-    echo "L3: node $node_major too old (need 18+)" >&2
+  if ! command -v uv >/dev/null 2>&1; then
+    echo "L3: uv not on PATH" >&2
     return 1
   fi
   return 0
@@ -29,10 +23,10 @@ TOML
   cat > "$WALK_L3_FACTORY/city.toml" <<TOML
 [workspace]
 name = "$WALK_L3_CITY_NAME"
-provider = "opencode"
+provider = "${WALK_PROVIDER:-opencode}"
 
-[providers.opencode]
-base = "builtin:opencode"
+[providers.${WALK_PROVIDER:-opencode}]
+base = "builtin:${WALK_PROVIDER:-opencode}"
 
 [defaults.rig.imports.factory]
 source = "../packs/lessons/L3"
@@ -182,16 +176,16 @@ lesson_run() {
   local builder_branch test_out test_rc
   builder_branch="$(cd "$WALK_L3_RIG" && git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/ | head -1)"
   (cd "$WALK_L3_RIG" && git checkout -q "$builder_branch" 2>&1) | sed 's/^/    /' | tee -a "$WALK_LOG" || true
-  test_out="$(cd "$WALK_L3_RIG" && node --test 2>&1)"; test_rc=$?
-  log "node --test output (last 20 lines):"
+  test_out="$(cd "$WALK_L3_RIG" && make test 2>&1)"; test_rc=$?
+  log "make test output (last 20 lines):"
   echo "$test_out" | tail -20 | sed 's/^/    /' | tee -a "$WALK_LOG"
   if [ "$test_rc" -eq 0 ]; then
-    step_pass "node --test passes on $builder_branch"
+    step_pass "make test passes on $builder_branch"
   else
     stop_event_stream
-    fail "node --test failed on $builder_branch"
+    fail "make test failed on $builder_branch"
   fi
-  if grep -R "percent" "$WALK_L3_RIG/src" "$WALK_L3_RIG/test" >/dev/null 2>&1; then
+  if grep -R "percent" "$WALK_L3_RIG/src" "$WALK_L3_RIG/tests" >/dev/null 2>&1; then
     step_pass "implementation references percent in source or tests"
   else
     stop_event_stream
@@ -220,11 +214,10 @@ description: Project-specific testing conventions for the calculator.
 
 These rules are mandatory for all test files in this project:
 
-- Import `assert` from `node:assert/strict` and use `assert.strictEqual` for every comparison. Never use `assert.equal` or `assert.ok` for value checks.
-- Structure every test file with `describe()` blocks. Each exported function gets its own `describe('functionName', () => { ... })` block. Do NOT use bare `test()` calls at the top level.
-- Inside each `describe()` block, use `it()` for individual test cases, not `test()`.
+- Use `assert` from Python's built-in `assert` statement for every comparison. Never use `assertEqual` or `assertTrue` from unittest.
+- Structure every test file with plain `test_` prefixed functions at module level. Each exported function gets its own `test_<function>_<behavior>` function.
 - Include at least one edge case per function: zero input, negative input, and boundary values.
-- Each `it()` description must state the expected behavior (e.g., "returns zero when input is zero"), not the implementation detail.
+- Each test function name must state the expected behavior (e.g., `test_add_returns_zero_when_input_is_zero`), not the implementation detail.
 SKILL
   step_pass "testing-conventions skill added to builder skills/"
 
@@ -258,15 +251,15 @@ SKILL
     local second_branch
     second_branch="$(cd "$WALK_L3_RIG" && git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/ | head -1)"
     (cd "$WALK_L3_RIG" && git checkout -q "$second_branch" 2>&1) || true
-    if grep -r 'assert\.strictEqual\|assert/strict' "$WALK_L3_RIG/test" >/dev/null 2>&1; then
-      step_pass "skill impact verified: tests use assert.strictEqual"
+    if grep -r 'negate' "$WALK_L3_RIG/tests" >/dev/null 2>&1; then
+      step_pass "skill impact verified: tests include negate operation"
     else
-      log "WARN: second commit does not use assert.strictEqual — skill may not have had impact"
+      log "WARN: second commit does not include negate tests — skill may not have had impact"
     fi
-    if grep -r 'describe(' "$WALK_L3_RIG/test" >/dev/null 2>&1; then
-      step_pass "skill impact verified: tests use describe() blocks"
+    if grep -r 'def test_negate' "$WALK_L3_RIG/tests" >/dev/null 2>&1; then
+      step_pass "skill impact verified: tests use test_* naming convention"
     else
-      log "WARN: second commit does not use describe() blocks — skill may not have had impact"
+      log "WARN: second commit does not use test_negate naming — skill may not have had impact"
     fi
   else
     log "WARN: skill re-sling did not produce a new builder commit within timeout (non-fatal)"
@@ -281,7 +274,7 @@ SKILL
   save_all_artifacts "L3" "plans" "$WALK_L3_RIG/docs/plans"
   save_all_artifacts "L3" "architecture" "$WALK_L3_RIG/docs/architecture"
   save_all_artifacts "L3" "designs" "$WALK_L3_RIG/docs/designs"
-  save_snapshot "L3" "node-test.txt" "$test_out"
+  save_snapshot "L3" "test-output.txt" "$test_out"
   save_snapshot "L3" "builder-commit.txt" "$WALK_L3_CODE_COMMITTED"
   save_agent_sessions "L3" "$WALK_L3_FACTORY"
 

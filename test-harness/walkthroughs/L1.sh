@@ -8,7 +8,7 @@
 #   - gc rig add <rig>
 #   - gc doctor --fix
 #   - gc status
-#   - project test runner (node --test)
+#   - project test runner (make test)
 #
 # L1 is setup-only: no formula sling, no agents. It creates the city and rig
 # that L2+ will use. The walkthrough validates that every L1 curriculum
@@ -19,8 +19,8 @@ set -uo pipefail
 source "$WALK_REPO_ROOT/test-harness/walkthroughs/_common.sh"
 
 lesson_prerequisites_check() {
-  if ! command -v node >/dev/null 2>&1; then
-    echo "L1: node not on PATH" >&2
+  if ! command -v uv >/dev/null 2>&1; then
+    echo "L1: uv not on PATH" >&2
     return 1
   fi
   return 0
@@ -75,11 +75,11 @@ lesson_run() {
 Calculator library with basic arithmetic operations.
 
 ## Tech Stack
-Node.js, native test runner (node --test).
+Python, pytest (make test).
 
 ## Project Structure
 - src/ — implementation files
-- test/ — test files
+- tests/ — test files
 MANIFEST
   fi
   if [ -f "$WALK_L1_FACTORY/PROJECT_MANIFEST.md" ]; then
@@ -168,13 +168,13 @@ MANIFEST
   echo "$git_status_out" | sed 's/^/    /' | tee -a "$WALK_LOG"
   step_pass "git status --short ran cleanly"
 
-  # README says: npm test (or your project's equivalent)
+  # README says: make test (or your project's equivalent)
   local test_out test_rc
-  test_out="$(cd "$WALK_L1_RIG" && node --test 2>&1)"; test_rc=$?
-  log "node --test output (last 10 lines):"
+  test_out="$(cd "$WALK_L1_RIG" && make test 2>&1)"; test_rc=$?
+  log "make test output (last 10 lines):"
   echo "$test_out" | tail -10 | sed 's/^/    /' | tee -a "$WALK_LOG"
   if [ "$test_rc" -eq 0 ]; then
-    step_pass "project tests pass (node --test)"
+    step_pass "project tests pass (make test)"
   else
     step_fail "project tests failed"
     fail "L1 project tests failed — CLAUDE.md commands are wrong"
@@ -183,7 +183,7 @@ MANIFEST
   # Save snapshots for validate-lesson-content skill
   save_snapshot "L1" "gc-status.txt" "$status_out"
   save_snapshot "L1" "git-status.txt" "$git_status_out"
-  save_snapshot "L1" "node-test.txt" "$test_out"
+  save_snapshot "L1" "test-output.txt" "$test_out"
   save_snapshot_file "L1" "city.toml" "$WALK_L1_FACTORY/city.toml"
   save_snapshot_file "L1" "pack.toml" "$WALK_L1_FACTORY/pack.toml"
   save_snapshot_file "L1" "PROJECT_MANIFEST.md" "$WALK_L1_FACTORY/PROJECT_MANIFEST.md"

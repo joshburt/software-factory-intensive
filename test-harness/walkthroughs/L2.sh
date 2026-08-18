@@ -30,10 +30,10 @@ TOML
   cat > "$WALK_L2_FACTORY/city.toml" <<TOML
 [workspace]
 name = "$WALK_L2_CITY_NAME"
-provider = "opencode"
+provider = "${WALK_PROVIDER:-opencode}"
 
-[providers.opencode]
-base = "builtin:opencode"
+[providers.${WALK_PROVIDER:-opencode}]
+base = "builtin:${WALK_PROVIDER:-opencode}"
 
 [defaults.rig.imports.factory]
 source = "../packs/lessons/L2"
@@ -204,7 +204,7 @@ MCP
 
   # README Part 5 step 3: edit prompt to reference the capability
   local prompt_file="$WALK_L2_SCRATCH/packs/lessons/L2/agents/planner/prompt.template.md"
-  printf '\n- Before writing acceptance criteria, use the Context7 MCP to look up the latest node:test API. Reference specific node:test features (describe, it, assert methods) in the acceptance criteria so the builder uses the correct API.\n' >> "$prompt_file"
+  printf '\n- Before writing acceptance criteria, use the Context7 MCP to look up the latest pytest API. Reference specific pytest features (fixtures, assert, parametrize) in the acceptance criteria so the builder uses the correct API.\n' >> "$prompt_file"
   step_pass "planner prompt updated with MCP reference and project rule"
 
   # README Part 5 step 4: restart and re-sling

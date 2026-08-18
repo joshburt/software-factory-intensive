@@ -6,14 +6,8 @@ set -uo pipefail
 source "$WALK_REPO_ROOT/test-harness/walkthroughs/_common.sh"
 
 lesson_prerequisites_check() {
-  if ! command -v node >/dev/null 2>&1; then
-    echo "L4: node not on PATH" >&2
-    return 1
-  fi
-  local node_major
-  node_major="$(node -v | sed -E 's/^v([0-9]+).*/\1/')"
-  if [ "${node_major:-0}" -lt 18 ]; then
-    echo "L4: node $node_major too old (need 18+)" >&2
+  if ! command -v uv >/dev/null 2>&1; then
+    echo "L4: uv not on PATH" >&2
     return 1
   fi
   return 0
@@ -29,10 +23,10 @@ TOML
   cat > "$WALK_L4_FACTORY/city.toml" <<TOML
 [workspace]
 name = "$WALK_L4_CITY_NAME"
-provider = "opencode"
+provider = "${WALK_PROVIDER:-opencode}"
 
-[providers.opencode]
-base = "builtin:opencode"
+[providers.${WALK_PROVIDER:-opencode}]
+base = "builtin:${WALK_PROVIDER:-opencode}"
 
 [defaults.rig.imports.factory]
 source = "../packs/lessons/L4"
@@ -194,16 +188,16 @@ lesson_run() {
   local builder_branch test_out test_rc
   builder_branch="$(cd "$WALK_L4_RIG" && git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/ | head -1)"
   (cd "$WALK_L4_RIG" && git checkout -q "$builder_branch" 2>&1) | sed 's/^/    /' | tee -a "$WALK_LOG" || true
-  test_out="$(cd "$WALK_L4_RIG" && node --test 2>&1)"; test_rc=$?
-  log "node --test output (last 20 lines):"
+  test_out="$(cd "$WALK_L4_RIG" && make test 2>&1)"; test_rc=$?
+  log "make test output (last 20 lines):"
   echo "$test_out" | tail -20 | sed 's/^/    /' | tee -a "$WALK_LOG"
   if [ "$test_rc" -eq 0 ]; then
-    step_pass "node --test passes on $builder_branch"
+    step_pass "make test passes on $builder_branch"
   else
     stop_event_stream
-    fail "node --test failed on $builder_branch"
+    fail "make test failed on $builder_branch"
   fi
-  if grep -R "clamp" "$WALK_L4_RIG/src" "$WALK_L4_RIG/test" >/dev/null 2>&1; then
+  if grep -R "clamp" "$WALK_L4_RIG/src" "$WALK_L4_RIG/tests" >/dev/null 2>&1; then
     step_pass "implementation references clamp in source or tests"
   else
     stop_event_stream
@@ -236,13 +230,13 @@ lesson_run() {
 Calculator library with basic arithmetic operations.
 
 ## Tech Stack
-Node.js, native test runner.
+Python, pytest (make test).
 
 ## Review Standards
 
 | Category | Rule | Severity |
 |----------|------|----------|
-| Style | All exported functions must have JSDoc comments | Medium |
+| Style | All exported functions must have docstrings | Medium |
 | Security | No hardcoded credentials or secrets | Critical |
 | Correctness | All error paths must be handled explicitly | High |
 | Testing | New public functions must have corresponding test cases | High |
@@ -293,7 +287,7 @@ MANIFEST
   save_all_artifacts "L4" "designs" "$WALK_L4_RIG/docs/designs"
   save_all_artifacts "L4" "reviews" "$WALK_L4_RIG/docs/reviews"
   save_all_artifacts "L4" "releases" "$WALK_L4_RIG/docs/releases"
-  save_snapshot "L4" "node-test.txt" "$test_out"
+  save_snapshot "L4" "test-output.txt" "$test_out"
   save_snapshot "L4" "builder-commit.txt" "$WALK_L4_CODE_COMMITTED"
   save_snapshot_file "L4" "PROJECT_MANIFEST.md" "$WALK_L4_RIG/docs/PROJECT_MANIFEST.md"
   save_agent_sessions "L4" "$WALK_L4_FACTORY"

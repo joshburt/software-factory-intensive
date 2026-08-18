@@ -6,14 +6,8 @@ set -uo pipefail
 source "$WALK_REPO_ROOT/test-harness/walkthroughs/_common.sh"
 
 lesson_prerequisites_check() {
-  if ! command -v node >/dev/null 2>&1; then
-    echo "C1: node not on PATH" >&2
-    return 1
-  fi
-  local node_major
-  node_major="$(node -v | sed -E 's/^v([0-9]+).*/\1/')"
-  if [ "${node_major:-0}" -lt 18 ]; then
-    echo "C1: node $node_major too old (need 18+)" >&2
+  if ! command -v uv >/dev/null 2>&1; then
+    echo "C1: uv not on PATH" >&2
     return 1
   fi
   return 0
@@ -29,10 +23,10 @@ TOML
   cat > "$WALK_C1_FACTORY/city.toml" <<TOML
 [workspace]
 name = "$WALK_C1_CITY_NAME"
-provider = "opencode"
+provider = "${WALK_PROVIDER:-opencode}"
 
-[providers.opencode]
-base = "builtin:opencode"
+[providers.${WALK_PROVIDER:-opencode}]
+base = "builtin:${WALK_PROVIDER:-opencode}"
 
 [defaults.rig.imports.factory]
 source = "../packs/lessons/C1"
@@ -200,16 +194,16 @@ lesson_run() {
   local builder_branch test_out test_rc
   builder_branch="$(cd "$WALK_C1_RIG" && git for-each-ref --sort=-committerdate --format='%(refname:short)' refs/heads/ | head -1)"
   (cd "$WALK_C1_RIG" && git checkout -q "$builder_branch" 2>&1) | sed 's/^/    /' | tee -a "$WALK_LOG" || true
-  test_out="$(cd "$WALK_C1_RIG" && node --test 2>&1)"; test_rc=$?
-  log "node --test output (last 20 lines):"
+  test_out="$(cd "$WALK_C1_RIG" && make test 2>&1)"; test_rc=$?
+  log "make test output (last 20 lines):"
   echo "$test_out" | tail -20 | sed 's/^/    /' | tee -a "$WALK_LOG"
   if [ "$test_rc" -eq 0 ]; then
-    step_pass "node --test passes on $builder_branch"
+    step_pass "make test passes on $builder_branch"
   else
     stop_event_stream
-    fail "node --test failed on $builder_branch"
+    fail "make test failed on $builder_branch"
   fi
-  if grep -R "multiply" "$WALK_C1_RIG/src" "$WALK_C1_RIG/test" >/dev/null 2>&1; then
+  if grep -R "multiply" "$WALK_C1_RIG/src" "$WALK_C1_RIG/tests" >/dev/null 2>&1; then
     step_pass "implementation references multiply in source or tests"
   else
     stop_event_stream
@@ -289,7 +283,7 @@ RETRO
   save_all_artifacts "C1" "validation" "$WALK_C1_RIG/docs/validation"
   save_all_artifacts "C1" "reviews" "$WALK_C1_RIG/docs/reviews"
   save_all_artifacts "C1" "releases" "$WALK_C1_RIG/docs/releases"
-  save_snapshot "C1" "node-test.txt" "$test_out"
+  save_snapshot "C1" "test-output.txt" "$test_out"
   save_snapshot "C1" "builder-commit.txt" "$WALK_C1_CODE_COMMITTED"
   save_snapshot_file "C1" "retrospective.md" "$WALK_C1_RETROSPECTIVE"
   save_agent_sessions "C1" "$WALK_C1_FACTORY"
