@@ -154,25 +154,25 @@ lesson_run() {
   fi
 
   local plan_check='count=$(find "'"$WALK_L3_RIG"'/docs/plans" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " "); [ "$count" -ge 1 ]'
-  wait_for "Planner to write docs/plans/*.md" "$plan_check" 600 15 "" "rig/factory.planner" "$WALK_L3_FACTORY" \
+  wait_for "Planner to write docs/plans/*.md" "$plan_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.planner" "$WALK_L3_FACTORY" \
     || { stop_event_stream; fail "Planner failed to produce plan artifact"; }
   WALK_L3_PLAN="$(find "$WALK_L3_RIG/docs/plans" -maxdepth 1 -type f -name '*.md' 2>/dev/null | head -1)"
   step_pass "Planner produced plan: $WALK_L3_PLAN"
 
   local arch_check='count=$(find "'"$WALK_L3_RIG"'/docs/architecture" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " "); [ "$count" -ge 1 ]'
-  wait_for "Architect to write docs/architecture/*.md" "$arch_check" 600 15 "" "rig/factory.architect" "$WALK_L3_FACTORY" \
+  wait_for "Architect to write docs/architecture/*.md" "$arch_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.architect" "$WALK_L3_FACTORY" \
     || { stop_event_stream; fail "Architect failed to produce architecture artifact"; }
   WALK_L3_ARCHITECTURE="$(find "$WALK_L3_RIG/docs/architecture" -maxdepth 1 -type f -name '*.md' 2>/dev/null | head -1)"
   step_pass "Architect produced architecture: $WALK_L3_ARCHITECTURE"
 
   local design_check='count=$(find "'"$WALK_L3_RIG"'/docs/designs" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " "); [ "$count" -ge 1 ]'
-  wait_for "Designer to write docs/designs/*.md" "$design_check" 600 15 "" "rig/factory.designer" "$WALK_L3_FACTORY" \
+  wait_for "Designer to write docs/designs/*.md" "$design_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.designer" "$WALK_L3_FACTORY" \
     || { stop_event_stream; fail "Designer failed to produce design artifact"; }
   WALK_L3_DESIGN="$(find "$WALK_L3_RIG/docs/designs" -maxdepth 1 -type f -name '*.md' 2>/dev/null | head -1)"
   step_pass "Designer produced design: $WALK_L3_DESIGN"
 
   local build_check='cd "'"$WALK_L3_RIG"'" && git log --all --not "'"$build_baseline_sha"'" --oneline 2>/dev/null | grep -q .'
-  wait_for "Builder to commit at least one new change" "$build_check" 900 20 "" "rig/factory.builder" "$WALK_L3_FACTORY" \
+  wait_for "Builder to commit at least one new change" "$build_check" "$WALK_BUILDER_BUDGET" 20 "" "rig/factory.builder" "$WALK_L3_FACTORY" \
     || { stop_event_stream; fail "Builder did not produce a new commit"; }
   WALK_L3_CODE_COMMITTED="$(cd "$WALK_L3_RIG" && git log --all --oneline | head -1)"
   step_pass "Builder committed: $WALK_L3_CODE_COMMITTED"
@@ -252,7 +252,7 @@ SKILL
 
   local expected_commits=$(( pre_resling_commit_count + 1 ))
   local commit2_check='cd "'"$WALK_L3_RIG"'" && [ "$(git log --all --oneline | wc -l | tr -d " ")" -ge '"$expected_commits"' ]'
-  if wait_for "second builder commit from skill re-sling" "$commit2_check" 900 20 "" "rig/factory.builder" "$WALK_L3_FACTORY"; then
+  if wait_for "second builder commit from skill re-sling" "$commit2_check" "$WALK_BUILDER_BUDGET" 20 "" "rig/factory.builder" "$WALK_L3_FACTORY"; then
     step_pass "skill re-sling produced a new builder commit"
     # Verify the skill had causal impact on the NEW commit's tests
     local second_branch

@@ -27,6 +27,9 @@ Thumbs.db
 *.swp
 *.swo
 
+# Obsidian machine-local editor config (workspace layout, window state, graph view)
+vault/.obsidian/
+
 # Project
 *.db
 *.db-journal

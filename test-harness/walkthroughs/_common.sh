@@ -271,6 +271,16 @@ progress_snapshot() {
   fi
 }
 
+# Live-agent wait budgets. Sized so a normal completion lands near 30% of budget,
+# leaving ~70% headroom for slower hardware, slower models, or larger prompts.
+# Measured on 2026-08-17 (gc 1.4.1, opencode, tmux transport): doc-writing agents
+# completed in 387-580s, i.e. 21-32% of WALK_AGENT_BUDGET. The 1.5x ratio between
+# the two tiers is preserved from the original 600/900 values — the builder tier is
+# larger because it edits code and runs a test suite, not just writes a document.
+# Override either for a slow machine, e.g. WALK_AGENT_BUDGET=2700.
+: "${WALK_AGENT_BUDGET:=1800}"
+: "${WALK_BUILDER_BUDGET:=2700}"
+
 wait_for() {
   local desc="$1" cmd="$2" timeout="$3" interval="${4:-3}"
   local rescue_cmd="${5:-}"        # optional shell to run when session is asleep/missing past rescue_after

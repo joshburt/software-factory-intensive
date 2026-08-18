@@ -1,25 +1,30 @@
-sfi-walkthrough-L2-1777265040-66194  /private/tmp/sfi-tutorial-walkthrough/1777265040-66184/L2/my-factory
-  Controller: supervisor-managed (PID 6690)
-  Authority: supervisor process PID 6690
+gc status: runtime status probe timed out; using partial status
+sfi-walkthrough-L2-1787007454-74944  /private/tmp/sfi-tutorial-walkthrough/1787007454-74930/L2/my-factory
+  Controller: supervisor-managed (PID 15463)
+  API:        http://127.0.0.1:8372
+  Authority: supervisor process PID 15463
   Suspended:  no
 
 Agents:
-  dog                     scaled (min=0, max=3)
-    dog-1                 running
-    dog-2                 running
-    dog-3                 running
-  rig/factory.architect   stopped
-  rig/factory.planner     stopped
-  control-dispatcher      running
-  rig/control-dispatcher  stopped
+  bd.dog                  scaled (min=0, max=2)
+    bd.dog-1              unknown  (partial status)
+    bd.dog-2              unknown  (partial status)
+  core.control-dispatcher unknown  (partial status)
+  rig/core.control-dispatcherunknown  (partial status)
+  rig/factory.architect   scaled (min=0, max=1)
+    rig/factory.architect unknown  (partial status)
+  rig/factory.planner     scaled (min=0, max=1)
+    rig/factory.planner   unknown  (partial status)
 
-4/7 agents running
-
-Named sessions:
-  control-dispatcher      awake (always)
-  rig/control-dispatcher  creating (always)
+0/6 agents running
 
 Rigs:
-  rig                     /private/tmp/sfi-tutorial-walkthrough/1777265040-66184/L2/rig
+  rig                     /private/tmp/sfi-tutorial-walkthrough/1787007454-74930/L2/rig
 
-Sessions: 5 active, 0 suspended
+Store health:
+  Path:        /private/tmp/sfi-tutorial-walkthrough/1787007454-74930/L2/my-factory/.beads/dolt
+  Size:        25.0 MB
+  Live rows:   173
+  Ratio:       0.1 MB/row  (threshold 1.0 MB/row)
+
+Sessions: 2 active, 0 suspended

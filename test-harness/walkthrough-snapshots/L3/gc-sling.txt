@@ -1,2 +1,3 @@
-Created rig-0h4 — "Add a percent operation: percent(whole, fraction) returns whole*fraction/100"
-Attached workflow rig-rsdw (formula "mol-feature-delivery") to rig-rsdw
+Created rig-c4v — "Add a percent operation: percent(whole, fraction) returns whole*fraction/100"
+Attached workflow rig-32v (formula "mol-feature-delivery") to rig-32v
+Dashboard: http://127.0.0.1:8372/city/sfi-walkthrough-L3-1787010570-22667/runs/rig-32v

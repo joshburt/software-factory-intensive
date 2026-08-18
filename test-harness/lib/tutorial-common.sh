@@ -152,6 +152,16 @@ step_pass() { echo "    ✓ $1"; }
 step_fail() { echo "    ✗ $1" >&2; lesson_rc=1; }
 
 assert_gc_version_ge_015() {
+  # KNOWN GAP: this floor is too loose to catch the Gas City 1.4.x config
+  # schema change (rig imports relocated from pack.toml to city.toml; see
+  # vault/Decisions/ADR-003). gc 1.4.0 and 1.4.1 both require the new
+  # schema and are both directly verified against it this session; the
+  # exact version that introduced the change is NOT known — do not raise
+  # this floor to a precise cutover without confirming it first. A correct
+  # fix needs real semver comparison, not glob matching (glob patterns
+  # like "1.4.*" would mis-order "1.10.0" against "1.4.0"); tracked as a
+  # follow-up rather than rushed here. See
+  # vault/Discoveries/2026-08-17-quickstart-broken-pack-toml-rig-imports.md.
   local v
   v="$(gc version 2>&1 | tail -1 | tr -d ' \r\n')"
   case "$v" in

@@ -1,1 +1,1 @@
-932c293 Add percent(whole, fraction) operation
+5e7e911 Add percent operation: percent(whole, fraction) = whole * fraction / 100

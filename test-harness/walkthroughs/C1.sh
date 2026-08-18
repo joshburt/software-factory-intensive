@@ -154,43 +154,43 @@ lesson_run() {
   fi
 
   local plan_check='count=$(find "'"$WALK_C1_RIG"'/docs/plans" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " "); [ "$count" -ge 1 ]'
-  wait_for "Planner to write docs/plans/*.md" "$plan_check" 600 15 "" "rig/factory.planner" "$WALK_C1_FACTORY" \
+  wait_for "Planner to write docs/plans/*.md" "$plan_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.planner" "$WALK_C1_FACTORY" \
     || { stop_event_stream; fail "Planner failed to produce plan artifact"; }
   WALK_C1_PLAN="$(find "$WALK_C1_RIG/docs/plans" -maxdepth 1 -type f -name '*.md' 2>/dev/null | head -1)"
   step_pass "Planner produced plan: $WALK_C1_PLAN"
 
   local arch_check='count=$(find "'"$WALK_C1_RIG"'/docs/architecture" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " "); [ "$count" -ge 1 ]'
-  wait_for "Architect to write docs/architecture/*.md" "$arch_check" 600 15 "" "rig/factory.architect" "$WALK_C1_FACTORY" \
+  wait_for "Architect to write docs/architecture/*.md" "$arch_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.architect" "$WALK_C1_FACTORY" \
     || { stop_event_stream; fail "Architect failed to produce architecture artifact"; }
   WALK_C1_ARCHITECTURE="$(find "$WALK_C1_RIG/docs/architecture" -maxdepth 1 -type f -name '*.md' 2>/dev/null | head -1)"
   step_pass "Architect produced architecture: $WALK_C1_ARCHITECTURE"
 
   local design_check='count=$(find "'"$WALK_C1_RIG"'/docs/designs" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " "); [ "$count" -ge 1 ]'
-  wait_for "Designer to write docs/designs/*.md" "$design_check" 600 15 "" "rig/factory.designer" "$WALK_C1_FACTORY" \
+  wait_for "Designer to write docs/designs/*.md" "$design_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.designer" "$WALK_C1_FACTORY" \
     || { stop_event_stream; fail "Designer failed to produce design artifact"; }
   WALK_C1_DESIGN="$(find "$WALK_C1_RIG/docs/designs" -maxdepth 1 -type f -name '*.md' 2>/dev/null | head -1)"
   step_pass "Designer produced design: $WALK_C1_DESIGN"
 
   local build_check='cd "'"$WALK_C1_RIG"'" && git log --all --not "'"$build_baseline_sha"'" --oneline 2>/dev/null | grep -q .'
-  wait_for "Builder to commit at least one new change" "$build_check" 900 20 "" "rig/factory.builder" "$WALK_C1_FACTORY" \
+  wait_for "Builder to commit at least one new change" "$build_check" "$WALK_BUILDER_BUDGET" 20 "" "rig/factory.builder" "$WALK_C1_FACTORY" \
     || { stop_event_stream; fail "Builder did not produce a new commit"; }
   WALK_C1_CODE_COMMITTED="$(cd "$WALK_C1_RIG" && git log --all --oneline | head -1)"
   step_pass "Builder committed: $WALK_C1_CODE_COMMITTED"
 
   local validation_check='count=$(find "'"$WALK_C1_RIG"'/docs/validation" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " "); [ "$count" -ge 1 ]'
-  wait_for "Validator to write docs/validation/*.md" "$validation_check" 600 15 "" "rig/factory.validator" "$WALK_C1_FACTORY" \
+  wait_for "Validator to write docs/validation/*.md" "$validation_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.validator" "$WALK_C1_FACTORY" \
     || { stop_event_stream; fail "Validator failed to produce validation artifact"; }
   WALK_C1_VALIDATION="$(find "$WALK_C1_RIG/docs/validation" -maxdepth 1 -type f -name '*.md' 2>/dev/null | head -1)"
   step_pass "Validator produced validation: $WALK_C1_VALIDATION"
 
   local review_check='count=$(find "'"$WALK_C1_RIG"'/docs/reviews" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " "); [ "$count" -ge 1 ]'
-  wait_for "Reviewer to write docs/reviews/*.md" "$review_check" 600 15 "" "rig/factory.reviewer" "$WALK_C1_FACTORY" \
+  wait_for "Reviewer to write docs/reviews/*.md" "$review_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.reviewer" "$WALK_C1_FACTORY" \
     || { stop_event_stream; fail "Reviewer failed to produce review artifact"; }
   WALK_C1_REVIEW="$(find "$WALK_C1_RIG/docs/reviews" -maxdepth 1 -type f -name '*.md' 2>/dev/null | head -1)"
   step_pass "Reviewer produced review: $WALK_C1_REVIEW"
 
   local release_check='count=$(find "'"$WALK_C1_RIG"'/docs/releases" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " "); [ "$count" -ge 1 ]'
-  wait_for "Release gate to write docs/releases/*.md" "$release_check" 600 15 "" "rig/factory.release-gate" "$WALK_C1_FACTORY" \
+  wait_for "Release gate to write docs/releases/*.md" "$release_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.release-gate" "$WALK_C1_FACTORY" \
     || { stop_event_stream; fail "Release gate failed to produce release artifact"; }
   WALK_C1_RELEASE="$(find "$WALK_C1_RIG/docs/releases" -maxdepth 1 -type f -name '*.md' 2>/dev/null | head -1)"
   step_pass "Release gate produced release record: $WALK_C1_RELEASE"

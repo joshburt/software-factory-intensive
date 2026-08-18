@@ -1,2 +1,3 @@
-Created rig-lm3 — "Plan the memory feature: store, recall, and clear calculator memory"
-Attached workflow rig-9a4n (formula "mol-feature-intake") to rig-9a4n
+Created rig-sev — "Plan the memory feature: store, recall, and clear calculator memory"
+Attached workflow rig-89w (formula "mol-feature-intake") to rig-89w
+Dashboard: http://127.0.0.1:8372/city/sfi-walkthrough-L2-1787007454-74944/runs/rig-89w

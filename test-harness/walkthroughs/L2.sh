@@ -153,7 +153,7 @@ lesson_run() {
     count=$(find "'"$WALK_L2_RIG"'/docs/plans" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " ")
     [ "$count" -ge 1 ]
   '
-  if ! wait_for "Planner to write docs/plans/*.md" "$plan_check" 600 15 "" "rig/factory.planner" "$WALK_L2_FACTORY"; then
+  if ! wait_for "Planner to write docs/plans/*.md" "$plan_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.planner" "$WALK_L2_FACTORY"; then
     stop_event_stream
     fail "Planner failed to produce plan artifact"
   fi
@@ -164,7 +164,7 @@ lesson_run() {
     count=$(find "'"$WALK_L2_RIG"'/docs/architecture" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " ")
     [ "$count" -ge 1 ]
   '
-  if ! wait_for "Architect to write docs/architecture/*.md" "$arch_check" 600 15 "" "rig/factory.architect" "$WALK_L2_FACTORY"; then
+  if ! wait_for "Architect to write docs/architecture/*.md" "$arch_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.architect" "$WALK_L2_FACTORY"; then
     stop_event_stream
     fail "Architect failed to produce architecture artifact"
   fi
@@ -224,7 +224,7 @@ MCP
     count=$(find "'"$WALK_L2_RIG"'/docs/plans" -maxdepth 1 -type f -name "*.md" 2>/dev/null | wc -l | tr -d " ")
     [ "$count" -ge 2 ]
   '
-  if wait_for "second plan artifact from config-over-chat re-sling" "$plan2_check" 600 15 "" "rig/factory.planner" "$WALK_L2_FACTORY"; then
+  if wait_for "second plan artifact from config-over-chat re-sling" "$plan2_check" "$WALK_AGENT_BUDGET" 15 "" "rig/factory.planner" "$WALK_L2_FACTORY"; then
     step_pass "config-over-chat produced a second plan artifact"
   else
     log "WARN: config-over-chat re-sling did not produce a second plan within timeout (non-fatal)"
