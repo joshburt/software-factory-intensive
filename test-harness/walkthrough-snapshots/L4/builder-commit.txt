@@ -1,1 +1,1 @@
-9e88fc1 Add clamp(x, lo, hi) to calculator module
+bd445bb Add clamp operation bounded to inclusive interval [lo, hi]

@@ -1,2 +1,3 @@
-Created rig-n4k — "Add a clamp operation: clamp(x, lo, hi) returns x bounded to [lo, hi]"
-Attached workflow rig-6fnd (formula "mol-delivery-review") to rig-6fnd
+Created rig-h89 — "Add a clamp operation: clamp(x, lo, hi) returns x bounded to [lo, hi]"
+Attached workflow rig-j5d (formula "mol-delivery-review") to rig-j5d
+Dashboard: http://127.0.0.1:8372/city/sfi-walkthrough-L4-1787016303-84731/runs/rig-j5d

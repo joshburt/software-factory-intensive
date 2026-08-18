@@ -2,66 +2,86 @@
 
 ## Verdict
 
-**Pass** — the implementation satisfies all acceptance criteria, matches the
-design specification, and the full test suite passes.
+**APPROVED** — the implementation satisfies all seven acceptance criteria from
+the feature plan and conforms to the architecture decision (Option A: existing
+file placement; Option D: undefined behaviors unspecified) and the design spec
+(interface, canonical form, full test matrix). No blocking issues found.
 
 ## Summary
 
-Commit `9e88fc1` adds `clamp(x, lo, hi)` to `src/calculator.js` and six
-corresponding tests to `test/calculator.test.js`. The function uses
-`Math.max(lo, Math.min(x, hi))`, exactly as specified in the design. All eight
-tests (two pre-existing, six new) pass with zero failures.
+The Builder added a single pure function `clamp(x, lo, hi)` to
+`src/calculator.js`, exported it alongside `add` and `subtract`, and added ten
+new tests to `test/calculator.test.js` covering the full edge-case matrix from
+the design spec. `npm test` passes 12/12 (2 pre-existing + 10 new). The change
+was committed on the `feature/clamp` branch only; `main` is untouched, and
+`package.json` was not modified.
 
 ## Findings
 
-- **Low — Implementation matches design exactly.** The function signature
-  (`clamp(x, lo, hi)`), placement (after `subtract`, before `module.exports`),
-  and expression (`Math.max(lo, Math.min(x, hi))`) all match
-  `docs/designs/clamp.md`.
+### Low — Implementation and design reviewed; no blocking issues
 
-- **Low — Export structure is correct.** `module.exports` now exposes
-  `{ add, subtract, clamp }`, consistent with the architecture decision to keep
-  all functions in one module.
-
-- **Low — All six acceptance-criteria test cases are present.** Tests cover:
-  below range, above range, within range, equal to `lo`, equal to `hi`, and
-  `lo === hi`. Test names and assertions match the design's test plan
-  line-for-line.
-
-- **Low — No unintended side effects.** The existing `add` and `subtract`
-  tests continue to pass. No changes were made to those functions.
-
-- **Low — Scope boundary respected.** No input validation, type coercion, new
-  files, CLI integration, or changes to existing functions — all consistent
-  with the plan's scope boundary and architecture's no-guard decision.
+- **Location**: `src/calculator.js` (lines 9–13), `test/calculator.test.js`
+  (lines 13–51)
+- **Impact**: None. The implementation is a single-expression pure function
+  matching the design's canonical form
+  (`Math.max(lo, Math.min(x, hi))`), exported via the existing object-literal
+  pattern, with no comments or JSDoc (matching file style), no validation,
+  no error-throwing, and no mutation of inputs.
+- **Suggested fix**: None required. Noted for completeness:
+  - `docs/` artifacts (plan, architecture, design) and this review are
+    untracked working-tree files managed by the factory harness — expected,
+    not part of the Builder's commit scope.
+  - The `docs/` directory itself (not just reviews) is gitignored via the
+    harness's `.gitignore` addition; artifact persistence is handled by the
+    factory, not the feature branch.
+- **Evidence checked**: acceptance criteria 1–7 from `docs/plans/clamp.md`;
+  architecture decisions A and D from `docs/architecture/clamp.md`; interface,
+  behavior, edge cases, and test plan from `docs/designs/clamp.md`; CLAUDE.md
+  conventions (CommonJS, `module.exports = { ... }`, `node:test`, one test
+  file per src file, `feature/<slug>` branch).
 
 ## Test Evidence
 
-```
-npm test — node --test
+Ran `npm test` (`node --test`) in the project rig on `feature/clamp` at commit
+`bd445bb`:
 
-✔ add returns the sum of two numbers (0.668ms)
-✔ subtract returns the difference of two numbers (0.054ms)
-✔ clamp returns lo when x is below range (0.054ms)
-✔ clamp returns hi when x is above range (0.040ms)
-✔ clamp returns x when x is within range (0.040ms)
-✔ clamp returns lo when x equals lo (0.036ms)
-✔ clamp returns hi when x equals hi (0.041ms)
-✔ clamp returns the bound when lo equals hi (0.038ms)
-
-tests 8 | pass 8 | fail 0
 ```
+✔ add returns the sum of two numbers
+✔ subtract returns the difference of two numbers
+✔ clamp returns the value when it is within bounds
+✔ clamp returns the lower bound when below the floor
+✔ clamp returns the upper bound when above the ceiling
+✔ clamp treats the lower bound as inclusive
+✔ clamp treats the upper bound as inclusive
+✔ clamp returns the shared value when bounds are equal
+✔ clamp preserves fractional values
+✔ clamp handles negative values within bounds
+✔ clamp clamps negative values below the floor
+✔ clamp clamps positive values above a negative ceiling
+ℹ tests 12
+ℹ pass 12
+ℹ fail 0
+```
+
+All ten required test cases from the design test plan are present verbatim
+(names and assertions match), plus the two pre-existing `add`/`subtract` tests
+remain green. No new dependencies, no `package.json` changes.
 
 ## Recommendation
 
-No blocking issues. The implementation is ready to proceed to the release gate.
+Merge-ready. Approve the step and proceed to the release gate. The only
+follow-up is informational: the untracked `docs/` files and the harness's
+`.gitignore`/`.beads` modifications are factory-managed and should not be
+committed by the feature branch; they require no action from the Builder.
 
 ## References
 
-- Request: `rig-n4k` — Add a clamp operation: clamp(x, lo, hi) returns x bounded to [lo, hi]
-- Plan: `docs/plans/clamp.md`
-- Architecture: `docs/architecture/clamp.md`
-- Design: `docs/designs/clamp.md`
-- Implementation commit: `9e88fc1`
-- Source: `src/calculator.js:9-11`
-- Tests: `test/calculator.test.js:13-35`
+- [Feature Plan](docs/plans/clamp.md)
+- [Architecture Decision](docs/architecture/clamp.md)
+- [Design Spec](docs/designs/clamp.md)
+- [CLAUDE.md](CLAUDE.md)
+- [src/calculator.js](src/calculator.js)
+- [test/calculator.test.js](test/calculator.test.js)
+- Commit: `bd445bb Add clamp operation bounded to inclusive interval [lo, hi]`
+  (branch `feature/clamp`; diff limited to `src/calculator.js` and
+  `test/calculator.test.js`)

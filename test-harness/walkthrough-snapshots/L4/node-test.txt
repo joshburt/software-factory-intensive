@@ -1,16 +1,20 @@
-✔ add returns the sum of two numbers (0.530875ms)
-✔ subtract returns the difference of two numbers (0.048208ms)
-✔ clamp returns lo when x is below range (0.038417ms)
-✔ clamp returns hi when x is above range (0.032ms)
-✔ clamp returns x when x is within range (0.033292ms)
-✔ clamp returns lo when x equals lo (0.029458ms)
-✔ clamp returns hi when x equals hi (0.030375ms)
-✔ clamp returns the bound when lo equals hi (0.026875ms)
-ℹ tests 8
+✔ add returns the sum of two numbers (0.399167ms)
+✔ subtract returns the difference of two numbers (0.049208ms)
+✔ clamp returns the value when it is within bounds (0.047042ms)
+✔ clamp returns the lower bound when below the floor (0.039833ms)
+✔ clamp returns the upper bound when above the ceiling (0.049125ms)
+✔ clamp treats the lower bound as inclusive (0.046875ms)
+✔ clamp treats the upper bound as inclusive (0.035792ms)
+✔ clamp returns the shared value when bounds are equal (0.037333ms)
+✔ clamp preserves fractional values (0.055875ms)
+✔ clamp handles negative values within bounds (0.070333ms)
+✔ clamp clamps negative values below the floor (0.041208ms)
+✔ clamp clamps positive values above a negative ceiling (0.035292ms)
+ℹ tests 12
 ℹ suites 0
-ℹ pass 8
+ℹ pass 12
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 77.743209
+ℹ duration_ms 43.408708
