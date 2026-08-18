@@ -1,20 +1,21 @@
 # Calculator Project Agent Rules
 
-This is a minimal JavaScript calculator project. Treat it as a real project
+This is a minimal Python calculator project. Treat it as a real project
 with the rules below. The active factory workflow owns step routing and
 artifact contracts.
 
 ## Tech stack
 
-- JavaScript (CommonJS modules, `require`/`module.exports`)
-- Node's built-in `node:test` for testing — run `node --test`
-- No build tooling — source runs directly under Node
-- Zero production dependencies; zero devDependencies
+- Python >= 3.11
+- pytest for testing — run `make test`
+- uv for dependency management
+- ruff for linting, black + isort for formatting, mypy for type checking
+- Zero production dependencies
 
 ## Project structure
 
-- `src/` — implementation files
-- `test/` — test files (one per src file, named `<name>.test.js`, using `node:test`)
+- `src/calculator/` — implementation package
+- `tests/` — test files (one per source package, named `test_<module>.py`)
 - `docs/plans/` — Planner output, one markdown file per feature
 - `docs/architecture/` — Architect output, one markdown file per feature
 - `docs/designs/` — Designer output, one design spec per feature
@@ -23,10 +24,19 @@ artifact contracts.
 
 ## Conventions
 
-- Export functions via `module.exports = { foo, bar }`
-- Every new src file needs a matching test file with at least one happy-path test
+- Export functions at package level via `__init__.py`
+- Every new source file needs a matching test file with at least one happy-path test
 - Prefer small pure functions over classes
 - Builder should commit each feature on a `feature/<slug>` branch — never straight to main
+- **Commands** — use these rather than invoking tools directly:
+
+  | Purpose | Command |
+  |---|---|
+  | Install / sync deps | `make install` |
+  | Format | `make format` |
+  | Lint | `make lint` |
+  | Type check | `make typecheck` |
+  | Run tests | `make test` |
 
 ## Workflow Expectations
 

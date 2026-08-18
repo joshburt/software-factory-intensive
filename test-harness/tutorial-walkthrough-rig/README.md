@@ -1,6 +1,6 @@
 # Calculator
 
-Minimal JavaScript calculator project.
+Minimal Python calculator project.
 
 This project is intentionally tiny: just enough structure for agents to produce
 meaningful planning artifacts and implementation changes.
@@ -9,12 +9,14 @@ meaningful planning artifacts and implementation changes.
 
 | Path | Purpose |
 |---|---|
-| `package.json` | Makes this a recognizable Node.js project |
-| `src/calculator.js` | Basic calculator functions |
-| `test/calculator.test.js` | Passing tests that demonstrate the test conventions |
+| `pyproject.toml` | Project metadata and tool configuration |
+| `Makefile` | Task runner (test, lint, format, typecheck) |
+| `src/calculator/__init__.py` | Basic calculator functions |
+| `tests/test_calculator.py` | Passing tests that demonstrate the test conventions |
 | `CLAUDE.md` | Minimal project rules agents read for context |
 
-## Why Node.js
+## Why Python
 
-The package.json + src/ + test/ shape is intentionally small and uses Node's
-built-in test runner.
+The `pyproject.toml` + `src/` + `tests/` shape follows the curriculum's
+engineering standard and uses the mandated toolchain (uv, pytest, ruff,
+black, mypy).
