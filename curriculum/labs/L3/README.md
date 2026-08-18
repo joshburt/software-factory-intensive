@@ -166,7 +166,7 @@ ls docs/plans
 ls docs/architecture
 ls docs/designs
 git log --oneline -5
-npm test       # or `node --test`
+make test
 cd -           # back to my-factory
 ```
 
@@ -201,11 +201,12 @@ description: Project-specific testing conventions for this project.
 
 These rules are mandatory for all test files in this project:
 
-- Import `assert` from `node:assert/strict` and use `assert.strictEqual` for every comparison. Never use `assert.equal` or `assert.ok` for value checks.
-- Structure every test file with `describe()` blocks. Each exported function gets its own `describe('functionName', () => { ... })` block. Do NOT use bare `test()` calls at the top level.
-- Inside each `describe()` block, use `it()` for individual test cases, not `test()`.
-- Include at least one edge case per function: zero input, negative input, and boundary values.
-- Each `it()` description must state the expected behavior, not the implementation detail.
+- Use `pytest` and `pytest-asyncio` with `asyncio_mode = "auto"`. Test functions are `async def` when testing async code.
+- Name test files `tests/<tier>/test_<module>.py` where `<tier>` is `unit`, `integration`, `system`, or `ui`.
+- Structure every test module with descriptive function names: `test_<behavior>_<condition>`. Use parametrize for multiple cases.
+- Include at least one edge case per function: empty input, null input, and boundary values.
+- Each test function name must state the expected behavior, not the implementation detail.
+- Use `pytest.fixture` for shared setup. Use `pytest.mark.parametrize` for data-driven tests.
 ```
 
 2. Edit the builder prompt to reference the skill:
@@ -228,7 +229,7 @@ gc sling <rig>/factory.planner "<a different small feature>" \
   --on mol-feature-delivery
 ```
 
-4. Compare the builder's test code from the two commits. The second commit should use `assert.strictEqual` (not `assert.equal`), `describe()` blocks, and explicit edge case tests — because the skill told it to.
+4. Compare the builder's test code from the two commits. The second commit should use `pytest` fixtures (not raw setup), `@pytest.mark.parametrize` for data-driven cases, and explicit edge case tests — because the skill told it to.
 
 In L2 you added an MCP (external data). Here you added a skill (internal rules). Different mechanisms, same idea — tell the agent what you want in a file it reads every time, not in a chat message it forgets.
 
@@ -242,7 +243,7 @@ For the rest of the lab, continue adding new skills to the other agents. For exa
 - No stage labels or manual downstream beads were used.
 - The graph routed all four roles.
 - The builder committed the implementation and tests.
-- Testing-conventions skill added to builder with visible impact on test code (assert.strictEqual, describe blocks).
+- Testing-conventions skill added to builder with visible impact on test code (pytest fixtures, parametrize, edge cases).
 
 ## Next Steps
 

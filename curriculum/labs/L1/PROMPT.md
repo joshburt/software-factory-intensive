@@ -34,7 +34,7 @@ Create the relevant agent instruction file in the project root — `CLAUDE.md` f
 # [Project Name] — Agent Instructions
 
 ## Role
-[What the agent is — e.g., "You are a frontend developer working on a React pizza ordering app"]
+[What the agent is — e.g., "You are a backend developer working on a FastAPI pizza ordering app"]
 
 ## Iteration Rule
 [From the workflow card's iteration loop — encoded as concrete steps]
@@ -46,10 +46,10 @@ Create the relevant agent instruction file in the project root — `CLAUDE.md` f
 
 ## Quality Gate
 [From the project manifest — what must pass before work is considered done]
-- `npm run lint` passes
-- `npm test` passes
-- No TypeScript errors
-- Component handles empty, loading, and error states
+- `make lint` passes
+- `make test` passes
+- `make typecheck` passes (mypy strict)
+- API endpoint handles empty, error, and edge case states
 
 ## Decision Log
 [Where to record what changed and why]
@@ -71,10 +71,12 @@ Track each run in a decision log: what the agent did wrong, what config change f
 
 ## Suggestions Based on Project Type
 
-- **React projects**: Add: "Follow existing component patterns in src/components. Use Tailwind for styling. Co-locate tests."
-- **API projects**: Add: "All endpoints follow REST conventions. Validate all inputs. Return structured JSON errors."
-- **Python projects**: Add: "Use type hints. Follow existing patterns in the codebase. Run pytest before committing."
-- **Monorepos**: Add: "Only modify files within the [package-name] workspace. Do not touch shared configs."
+The stack is mandated by [`ENGINEERING_STANDARD.md`](../../ENGINEERING_STANDARD.md) (Python, FastAPI, SQLAlchemy, Pydantic, pytest, Playwright). Within that stack, tailor by the kind of work:
+
+- **API endpoint work**: Add: "Follow existing router patterns in src/<pkg>/api/routers/. Use Pydantic schemas for request/response. Services raise domain errors from errors.py."
+- **Data model / migration work**: Add: "Follow existing model patterns in src/<pkg>/db/models/. Alembic migrations are human-approved."
+- **UI page work**: Add: "Follow existing Jinja2 template patterns in src/<pkg>/api/templates/. Use Playwright for UI tests."
+- **Background job / service work**: Add: "Follow existing service patterns in src/<pkg>/services/. Use pytest for testing."
 
 ## Gas City Connection
 

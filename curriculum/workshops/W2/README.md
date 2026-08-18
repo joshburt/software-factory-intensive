@@ -81,7 +81,7 @@ Before mapping roles, catalog what your factory can use:
 | Category | What You Have | Relevant Roles |
 |----------|---------------|----------------|
 | AI Models | Your CLI coding agent(s) (Claude Code, Codex CLI, OpenCode, etc.) | All agents |
-| CLI Tools | npm, gh, your test runner | Builder, Release Gate |
+| CLI Tools | make, gh, pytest, mypy, ruff | Builder, Release Gate |
 | MCP Servers | GitHub, Sentry, etc. | Reviewer, Architect |
 | Project Instructions | Agent instruction files (CLAUDE.md, AGENTS.md, etc.) | All agents |
 | Knowledge Sources | PROJECT_MANIFEST.md, ADRs | Planner, Architect |

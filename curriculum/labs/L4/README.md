@@ -143,7 +143,7 @@ ls docs/designs
 ls docs/reviews
 ls docs/releases
 git log --oneline -5
-npm test       # or `node --test`
+make test
 cd -           # back to my-factory
 ```
 
@@ -164,7 +164,7 @@ A complete L4 run should produce artifacts with these sections:
 | Review | Verdict, Summary, Findings, Test Evidence, Recommendation, References |
 | Release gate | Verdict, Required Checks, Evidence, Risks, Decision Notes, References |
 
-For your chosen feature, `npm test` (or your project's equivalent) should exit 0 with the new tests included.
+For your chosen feature, `make test` should exit 0 with the new tests included.
 
 ## 7. Prove the manifest is load-bearing
 

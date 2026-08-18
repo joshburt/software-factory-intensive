@@ -137,7 +137,7 @@ ls docs/validation
 ls docs/reviews
 ls docs/releases
 git log --oneline -5
-npm test       # or `node --test`
+make test
 cd -           # back to my-factory
 ```
 

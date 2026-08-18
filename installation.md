@@ -133,9 +133,69 @@ gc doctor
 
 ---
 
-## 5. Python installation
+## 5. Python and project toolchain
 
-[Python 3.8+](https://www.python.org/downloads/) is required to run the factory-activity-agent script, which makes the curriculum setup and teardown much easier. You can check your Python version with `python3 --version`.
+[Python >= 3.11](https://www.python.org/downloads/) is required for the mandated project stack. You can check your Python version with `python3 --version`. If you're below 3.11, install a newer version via Homebrew (`brew install python@3.11`) or your package manager.
+
+### 5a. uv (package manager)
+
+[`uv`](https://docs.astral.sh/uv/) is the mandated package manager. Install it:
+
+```bash
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# or via Homebrew
+brew install uv
+
+# Verify
+uv --version   # must report >= 0.4.0
+```
+
+`uv` replaces pip, poetry, and conda. All project dependencies are managed through `uv sync` and committed `uv.lock` files.
+
+### 5b. GNU Make
+
+GNU Make is the mandated task runner. All project targets (lint, test, typecheck, format, db operations) are invoked through `make`.
+
+```bash
+# macOS — comes with Xcode Command Line Tools
+xcode-select --install
+
+# Linux
+sudo apt install make          # Debian/Ubuntu
+sudo dnf install make          # Fedora
+
+# Verify
+make --version   # must report GNU Make 4.x
+```
+
+### 5c. Docker
+
+Docker is required for system tests (PostgreSQL container) and the UI test tier. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) or use your package manager:
+
+```bash
+# macOS — Docker Desktop recommended
+# Linux
+sudo apt install docker.io docker-compose-v2
+```
+
+Verify:
+
+```bash
+docker --version
+docker compose version
+```
+
+### 5d. Playwright browsers
+
+The UI test tier uses Playwright with Chromium. After installing the project dependencies (step 5a), install the browser:
+
+```bash
+uv run playwright install chromium
+```
+
+This downloads the Chromium binary that `pytest-playwright` uses for UI tests. You need to re-run this when Playwright is upgraded.
 
 ---
 
@@ -150,7 +210,7 @@ Your Gas City factory lives at `my-factory/` — you'll copy the committed templ
 
 ---
 
-## Troubleshooting
+## 7. Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|

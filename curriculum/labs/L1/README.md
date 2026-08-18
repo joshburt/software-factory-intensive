@@ -144,8 +144,7 @@ If you skip this, or if `gc doctor` / a later `gc sling` reports `bd create: ...
 ```bash
 cd ~/path/to/your-project
 git status --short
-npm test
-# or your project's equivalent (e.g. `node --test`)
+make test
 ```
 
 If a command fails, fix your agent instruction file (ex. `CLAUDE.md`) before moving on. Later agents will rely on these instructions.

@@ -112,14 +112,14 @@ Your own card should look structurally identical. The content will differ; the s
 
 ## The Running Example: Fired Up Pizza's Cart Total Feature
 
-Throughout this workshop, we use a single running example: **you're about to build the shopping cart total line on Fired Up Pizza's customer-facing menu page.** The ticket is `FUP-3`. The feature needs to sum selected menu items, apply a size multiplier, add toppings, and display a running total in cents (formatted as dollars).
+Throughout this workshop, we use a single running example: **you're about to build the shopping cart total endpoint and display for Fired Up Pizza's menu page.** The ticket is `FUP-3`. The feature needs an API endpoint that sums selected menu items, applies a size multiplier, adds toppings, and returns a running total in cents (formatted as dollars). The frontend is a Jinja2 template with vanilla CSS and JS.
 
 Why this example? It's small enough to imagine in 60 seconds, but it hits every sharp edge of the AI workflow:
 
-- There's a **specific target file** (`src/components/Cart.tsx`) — so the Prompt Template has something to reference.
-- There are **existing reference files** (`src/components/MenuCard.tsx`, `src/components/OrderStatus.tsx`) that show the pattern.
-- There are **project conventions** (prices in cents, Tailwind utility classes, no inline styles) that the agent will forget if you don't remind it.
-- There's a **decision boundary** (does the cart total live in Context or local state?) that you want the agent to escalate — not decide itself.
+- There's a **specific target endpoint** (`src/<pkg>/api/routers/cart.py`) — so the Prompt Template has something to reference.
+- There are **existing reference files** (`src/<pkg>/api/routers/menu.py`, `src/<pkg>/services/order_service.py`) that show the pattern.
+- There are **project conventions** (prices in integer cents, Pydantic schemas at the HTTP boundary, domain errors in `errors.py`) that the agent will forget if you don't remind it.
+- There's a **decision boundary** (does the cart total logic live in the service layer or the router?) that you want the agent to escalate — not decide itself.
 
 If you're working against your own project, substitute your own small feature — but pick one that has at least one "the agent will probably get this wrong" risk. A genuinely trivial feature ("change button color") won't produce a useful workflow card because there's nothing for the card to *protect* against.
 
@@ -179,7 +179,7 @@ How do you currently provide context to your agent?
 - Pasting full files into the chat?
 - Referencing paths like `src/components/Cart.tsx` and hoping the agent opens them?
 - Linking to tickets? Quoting ACs verbatim, or summarizing?
-- Re-typing the same framing sentences every session ("we use TypeScript strict, Tailwind, no inline styles")?
+- Re-typing the same framing sentences every session ("we use FastAPI, SQLAlchemy async, Pydantic schemas at the boundary")?
 
 Write down three bullets describing your current practice, without judging it:
 
@@ -234,12 +234,12 @@ The Prompt Template section answers: **what fields are in every prompt I send to
 This is structural — it names the *fields*, not the values. For the Cart Total feature, a prompt instantiated from the template may look like this:
 
 ```
-Target: src/components/Cart.tsx (FUP-3)
+Target: src/<pkg>/api/routers/cart.py (FUP-3)
 ACs: [pasted verbatim from the ticket]
-Stack constraints: React 18 + TS strict, Tailwind utilities only,
-  no inline styles, no `any`.
-Reference files: src/components/MenuCard.tsx, src/components/OrderStatus.tsx
-Testing hint: Vitest + RTL. Co-located Cart.test.tsx.
+Stack constraints: FastAPI, SQLAlchemy async, Pydantic schemas at HTTP boundary,
+  domain errors in errors.py, no `fastapi` import in services.
+Reference files: src/<pkg>/api/routers/menu.py, src/<pkg>/services/order_service.py
+Testing hint: pytest + pytest-asyncio. Test in tests/integration/test_cart.py.
 ```
 
 The template describes the shape — `Target`, `ACs`, `Stack constraints`, `Reference files`, `Testing hint`. The prompt substitutes real values.
@@ -253,9 +253,9 @@ Every prompt I paste into Claude Code for this project includes, in order:
 
 - **Target**: a file path under `src/` or a ticket ID (`FUP-3`, etc.). No "the cart thing."
 - **Acceptance criteria**: pasted verbatim from the ticket. If I'm inventing the AC on the fly, I write them down first and paste the exact text.
-- **Stack constraints**: "React 18 + TypeScript strict, Tailwind CSS utility classes, no inline styles, no `any` types." These never change.
-- **Reference files**: two similar existing files the agent should read first for pattern-matching (e.g., for a new page component I'd reference `src/pages/MenuPage.tsx` and `src/pages/OrderStatusPage.tsx`).
-- **Testing hint**: "Vitest + React Testing Library. Co-located `<Name>.test.tsx` file."
+- **Stack constraints**: "FastAPI, SQLAlchemy 2.0 async, Pydantic v2 schemas at the HTTP boundary, domain errors in `errors.py`, no `fastapi` import in services." These never change.
+- **Reference files**: two similar existing files the agent should read first for pattern-matching (e.g., for a new router I'd reference `src/<pkg>/api/routers/menu.py` and `src/<pkg>/services/order_service.py`).
+- **Testing hint**: "pytest + pytest-asyncio. Integration tests in `tests/integration/`. Target `tests/integration/test_<name>.py`."
 ```
 
 **What's happening here:** Each bullet names a concrete field, and the text after the colon describes exactly what goes in that field. The agent (and future-you) can read this and instantiate a prompt without any guesswork.
@@ -267,26 +267,28 @@ Every prompt I paste into Claude Code for this project includes, in order:
 Once your Prompt Template is written, test it by instantiating a full prompt for the Cart Total feature. This is the prompt you'd actually paste into Claude Code if you were starting the work right now:
 
 ```
-Target: src/components/Cart.tsx (FUP-3)
+Target: src/<pkg>/api/routers/cart.py (FUP-3)
 
 Acceptance criteria (verbatim from FUP-3):
-- Cart component displays a running total in the header bar.
-- Total is computed as: sum(item.priceCents * sizeMultiplier + sum(topping.priceCents)).
-- Total is formatted as a dollar string with two decimals (e.g. "$14.50").
-- Empty cart shows "$0.00", not a blank string.
-- Total updates within 16ms of any cart mutation.
+- GET /v1/cart/total returns the running total for the current session.
+- Total is computed as: sum(item.price_cents * size_multiplier + sum(topping.price_cents)).
+- Total is returned as a JSON object with "total_cents" (int) and "total_dollars" (str, e.g. "$14.50").
+- Empty cart returns {"total_cents": 0, "total_dollars": "$0.00"}.
+- Response time stays under 200ms for carts with up to 50 items.
 
 Stack constraints:
-- React 18 + TypeScript strict mode.
-- Tailwind CSS utility classes only. No inline styles. No CSS files.
-- Prices stored as integer cents; never mix cents and dollars in the same function.
-- No `any` types. Use `Result<T>` wrapper for any fallible operation.
+- FastAPI router, async handler. Service layer in src/<pkg>/services/.
+- Pydantic v2 schemas for request/response. No Pydantic in services.
+- SQLAlchemy 2.0 async. Mapped/mapped_column typed style. Prices stored as integer cents.
+- Domain errors in errors.py. NotFoundError -> 404, ValidationError -> 422.
+- Services raise domain errors; they never import fastapi.
+- No `any` types. mypy strict across the whole package.
 
 Reference files (read these first):
-- src/components/MenuCard.tsx — for the existing price formatting helper usage.
-- src/components/OrderStatus.tsx — for the header-bar layout pattern.
+- src/<pkg>/api/routers/menu.py — for the existing router pattern.
+- src/<pkg>/services/order_service.py — for the service layer pattern.
 
-Testing hint: Vitest + React Testing Library. Co-located `Cart.test.tsx`.
+Testing hint: pytest + pytest-asyncio. Integration tests in tests/integration/test_cart.py.
 Cover empty cart, single item, item with toppings, size multiplier edge cases.
 ```
 
@@ -331,8 +333,8 @@ This section has numbered steps, and each step names a concrete action. For the 
 
 1. Agent reads the spec (ticket + reference files), writes a 3-line plan.
 2. I confirm or redirect the plan.
-3. Agent writes one slice (one component, one hook, or one test — never more).
-4. I run `npm run lint && npm run type-check && npm test`. All three must exit 0.
+3. Agent writes one slice (one router, one service, or one test — never more).
+4. I run `make lint && make typecheck && make test`. All three must exit 0.
 5. If a gate fails: update the spec or `CLAUDE.md`, `git reset --hard HEAD`, re-sling. Never type a correction into chat.
 6. If a gate passes: commit with a conventional message, move to next slice.
 7. All slices landed: agent opens a PR; I review; issues that would repeat go into `CLAUDE.md`, not into PR comments.
@@ -346,33 +348,33 @@ Every feature follows this loop. If I skip a step I have to say why in the commi
 
 1. **Plan first.** The agent reads the spec and the two reference files, then writes a 3-line plan as a bead comment before any code.
 2. **I confirm or redirect** the plan. If the plan invents new patterns or touches files outside scope, I reject and clarify.
-3. **Agent writes code in one-slice increments.** A slice is one component, one hook, one route, or one test. Never all three at once.
-4. **I run the gates after every slice**: `npm run lint && npm run type-check && npm test`. All three must exit 0.
+3. **Agent writes code in one-slice increments.** A slice is one router, one service, one model, or one test. Never all three at once.
+4. **I run the gates after every slice**: `make lint && make typecheck && make test`. All three must exit 0.
 5. **If a gate fails**, I update the spec or `CLAUDE.md` with the missing constraint, `git reset --hard HEAD`, and re-sling. I do not type "oh and also please X" into chat.
-6. **If a gate passes**, the agent commits with a conventional message (`feat(cart): show order total`) and moves to the next slice.
+6. **If a gate passes**, the agent commits with a conventional message (`feat(cart): add cart total endpoint`) and moves to the next slice.
 7. **When all slices land**, the agent opens a PR. I review; if I find issues that would repeat, I push them into `CLAUDE.md` rather than leaving a PR comment.
 ```
 
 **What's happening here:** Step 5 is the load-bearing step. It's the moment ad-hoc prompting usually sneaks in, and it's where most workflow cards fall silent. By spelling out "update the spec or `CLAUDE.md`, `git reset --hard HEAD`, re-sling," you're encoding the discipline that separates a factory from a chat.
 
-**Pitfall:** "Run the tests" is not a step. "Run `npm run lint && npm run type-check && npm test` and require all three to exit 0" is a step. The specific command and the specific success criterion are what make it enforceable.
+**Pitfall:** "Run the tests" is not a step. "Run `make lint && make typecheck && make test` and require all three to exit 0" is a step. The specific command and the specific success criterion are what make it enforceable.
 
 ### Step 2.3a: Worked Example — A Gate Failure, Handled Two Ways
 
-Consider the same Cart Total feature. The agent produces code. You run `npm run type-check`. It fails with:
+Consider the same Cart Total feature. The agent produces code. You run `make typecheck`. It fails with:
 
 ```
-src/components/Cart.tsx:42:15 - error TS2345: Argument of type 'number' is
-  not assignable to parameter of type 'Cents'. Cents is a branded type.
+src/<pkg>/api/routers/cart.py:42:15 - error: Argument 1 to "get_cart_total" has incompatible type
+  "Session"; expected "CartRepository"  [arg-type]
 ```
 
 **The ad-hoc response (what your card is replacing):**
 
 ```
-You: "Oh — we have a branded Cents type. Please use that instead of `number`."
+You: "Oh — we have a CartRepository. Please use that instead of passing the session directly."
 Agent: [fixes the file, produces a patch]
-You: type-check again... passes.
-[Session continues. The constraint "use Cents branded type, not number"
+You: typecheck again... passes.
+[Session continues. The constraint "use CartRepository, not raw session"
  lives nowhere except in this chat history. Next session, the agent will
  re-invent the same bug. You'll paste the correction again. And again.]
 ```
@@ -382,14 +384,13 @@ You: type-check again... passes.
 ```
 You: [don't type anything to the agent]
 You: Open CLAUDE.md. Add to the "Project conventions" section:
-     - "All monetary values use the `Cents` branded type from
-       src/types/money.ts. Never pass raw `number` to any function
-       whose parameter is typed `Cents`."
-You: git add CLAUDE.md && git commit -m "docs(claude): require Cents branded type for money"
+     - "Services receive a repository instance, not a raw session.
+       Import CartRepository from db/repositories/cart.py."
+You: git add CLAUDE.md && git commit -m "docs(claude): require repository injection for services"
 You: git reset --hard HEAD (in the project repo — throw away the bad patch)
 You: re-sling the bead (or re-run the prompt)
-Agent: reads the updated CLAUDE.md, produces new code that uses `Cents` correctly.
-       type-check passes first try.
+Agent: reads the updated CLAUDE.md, produces new code that uses CartRepository correctly.
+       typecheck passes first try.
 [The constraint now lives in CLAUDE.md. Every future session inherits it.
  You pay the correction cost once, not N times.]
 ```
@@ -412,9 +413,9 @@ Example from the Fired Up Pizza reference:
 Decisions I keep for myself (the agent may propose; I decide):
 
 - Database schema changes (we only have `orders`, `menu_items`, `toppings` — adding a column is a decision).
-- New package or dependency additions. npm registry is rich; bar for pulling something in is high.
+- New package or dependency additions. PyPI is rich; bar for pulling something in is high.
 - API contract changes (URL shape, request/response shape). Any change here potentially breaks the frontend-backend contract.
-- Architecture patterns I haven't used elsewhere in the codebase (new state-management approach, new layout pattern, new routing scheme).
+- Architecture patterns I haven't used elsewhere in the codebase (new layer pattern, new middleware, new routing scheme).
 - Anything that touches money formatting or order total math.
 
 Decisions the agent owns:
@@ -422,28 +423,30 @@ Decisions the agent owns:
 - Function-level implementation details within a file.
 - Test case design (which cases to write, how to structure fixtures).
 - Error-message wording for user-facing error states (as long as it matches the existing voice — cheerful, specific, non-technical).
-- File organization *within* a component directory (if it's adding a sub-component, that's the agent's call).
-- Choosing between equivalent idiomatic approaches in React or TypeScript.
+- File organization *within* a service or router module (if it's adding a helper function, that's the agent's call).
+- Choosing between equivalent idiomatic approaches in Python or FastAPI.
 ```
 
 **What's happening here:** The "I keep for myself" list is your leverage point — it's where you insert yourself into the loop to prevent the agent from making a choice that's expensive to reverse. The "agent owns" list is equally important: it says "don't stop the agent for this; let it decide." Without the second list, the agent will constantly pause for confirmations on things you don't care about.
 
 **Pitfall:** If you list fewer than three items on either side, you probably haven't thought hard enough. Sit with it for another two minutes. The goal is a card a stranger could read and predict, with ~90% accuracy, which side of the line a novel decision will land on.
 
-### Tailor to Your Project Type
+### Tailor to Your Kind of Work
 
-| Project type | What to emphasize in the card |
+The stack is mandated by [`ENGINEERING_STANDARD.md`](../../ENGINEERING_STANDARD.md) — Python, FastAPI, SQLAlchemy, Pydantic, pytest, Playwright — but the kind of work you do within that stack varies. Use this table to adapt your card:
+
+| Kind of work | What to emphasize in the card |
 |--------------|-------------------------------|
-| React / TypeScript | Constrain to existing component patterns under `src/components/`; forbid inventing new utility files without asking |
-| Backend API | Context reset rule: "start fresh when switching between routes and middleware"; list the testing command explicitly |
-| Monorepo | Specify which package the agent is allowed to modify per session — lock scope per feature |
-| Infra / IaC | Require the agent to `terraform plan` (or equivalent dry-run) before any apply; checkpoint before state changes |
-| Mobile | Force the agent to confirm target platform(s) and minimum OS version in every prompt |
-| Issue tracker in use | Prompt template must reference the ticket ID (`FUP-4`, `PROJ-123`) as the Spec field |
-| CLI tool | Prompt template must reference the subcommand namespace; Iteration Loop must include a `--help` output check |
-| Data pipeline | Decision Checkpoint must include "any change to schema, partitioning, or retention" as a human-decides item |
+| API endpoint | Constrain to existing router patterns under `src/<pkg>/api/routers/`; forbid raw SQL outside `db/repositories/` |
+| Data model / migration | Context reset rule: "start fresh after a schema change"; Decision Checkpoint: "migrations are human-approved" |
+| Background job / service | Reference existing service patterns; Iteration Loop must include `make test` and `make typecheck` |
+| UI page / template | Reference existing Jinja2 templates under `src/<pkg>/api/templates/`; testing hint: Playwright UI tests |
+| Configuration / settings | Decision Checkpoint: "new env vars must be added to `.env.example` and `Settings` model" |
+| Integration with external API | Prompt template must reference the client SDK pattern under `src/<pkg>/client/`; security: no secrets in source |
+| Bug fix | Iteration Loop: "write a failing test that reproduces the bug first, then fix" |
+| Performance optimization | Decision Checkpoint: "any query change must have a SQL explain plan reviewed" |
 
-If your project matches multiple rows, pull constraints from each.
+If your work touches multiple areas, pull constraints from each.
 
 ### Quality Bar for the Card
 
@@ -477,7 +480,7 @@ If you can imagine a second question the stranger would still have, the bullet i
 
 ### Step 3.2: The Failing-Gate Test (~5 min)
 
-Re-read Section 3 (Iteration Loop). Simulate this scenario: the agent writes code, you run the gates, and `npm run type-check` fails.
+Re-read Section 3 (Iteration Loop). Simulate this scenario: the agent writes code, you run the gates, and `make typecheck` fails.
 
 Walk through the card step by step:
 
@@ -553,15 +556,15 @@ Before you consider the card done, stress-test it against three scenarios. For e
 
 ### Scenario 1: A teammate borrows your card for their own project
 
-Imagine a teammate clones your repo, reads your workflow card, and asks: *"Can I apply this to my own React + TypeScript side project?"*
+Imagine a teammate clones your repo, reads your workflow card, and asks: *"Can I apply this to my own Python + FastAPI side project?"*
 
 - **Expected outcome:** They can reuse the shape (4 sections, same headings) but must replace every bullet with their own project's specifics. The card should be obviously project-specific — not a universal template.
 - **What it tests:** Whether your bullets reference *this* project's files, tickets, and commands, or whether they accidentally read as generic advice.
 - **If the card fails:** Look for bullets that could apply to any project unchanged. Those are the ones to rewrite with concrete names.
 
-### Scenario 2: The agent proposes adding a new npm dependency
+### Scenario 2: The agent proposes adding a new dependency
 
-Imagine it's your next working session. The agent is implementing the Cart Total feature and proposes adding `lodash.sumby` to the package.json because it's "a utility library everyone uses."
+Imagine it's your next working session. The agent is implementing the Cart Total feature and proposes adding `numpy` to `pyproject.toml` because it's "a utility library that makes summing numbers easier."
 
 - **Expected outcome:** Your Decision Checkpoint section should fire — "new package/dependency additions" is in the "I decide" list. You reject, the agent implements the summation without the dependency.
 - **What it tests:** Whether your Decision Checkpoint categories match the decisions the agent will actually try to make.
@@ -569,7 +572,7 @@ Imagine it's your next working session. The agent is implementing the Cart Total
 
 ### Scenario 3: Two gate failures in a row, same failure mode
 
-Imagine you run `npm run type-check` and it fails. You update the relevant agent instruction file (ex. `CLAUDE.md`) with a new constraint, `git reset --hard HEAD`, re-sling. The agent produces new code. You run `npm run type-check` again — it fails again, same error.
+Imagine you run `make typecheck` and it fails. You update the relevant agent instruction file (ex. `CLAUDE.md`) with a new constraint, `git reset --hard HEAD`, re-sling. The agent produces new code. You run `make typecheck` again — it fails again, same error.
 
 - **Expected outcome:** Your Iteration Loop, or your Context Reset Rule, should tell you what to do: reset the session entirely (the second failure suggests context pollution, not a missing constraint). Either the Context Reset Rule has a trigger like "two consecutive gate failures with the same error" or the Iteration Loop has an escape-hatch step.
 - **What it tests:** Whether your card handles the repeated-failure case, or whether it silently assumes the first fix always works.
@@ -623,7 +626,7 @@ When you review your own output, check:
 | The card references a file that doesn't exist yet (`src/components/Cart.tsx`) | That's okay — the card is aspirational as well as descriptive. Just make sure the path is plausible (follows your project's directory conventions). If it's purely invented, replace it with a file that *does* exist and serves the same pattern-matching purpose. |
 | I can't decide if my Context Reset Rule should include "at the start of each day" | It shouldn't — that's a schedule, not a trigger. Reset triggers describe the state of the session, not the clock. If you want a daily refresh, put that in the relevant agent instruction file (ex. `CLAUDE.md`) later as an agent lifecycle rule. |
 | My Iteration Loop has 12 steps | You're including steps that belong in the relevant agent instruction file (ex. `CLAUDE.md`) (the agent's process) rather than your own (the human's process). The Loop section describes what happens between slinging work and merging it — not the internal steps the agent takes. Cut to 5–7. |
-| I don't know which commands to put in the Iteration Loop because my project doesn't have tests yet | Put in the commands you'd run if you had tests (`npm test`), plus a note that tests are aspirational. Then add "set up test infrastructure" to your backlog. A card that acknowledges a gap is stronger than a card that silently omits it. |
+| I don't know which commands to put in the Iteration Loop because my project doesn't have tests yet | Put in the commands you'd run if you had tests (`make test`), plus a note that tests are aspirational. Then add "set up test infrastructure" to your backlog. A card that acknowledges a gap is stronger than a card that silently omits it. |
 | The PROMPT.md sister file seems to duplicate the README | It does, intentionally. The README is the written guide; PROMPT.md is the facilitator script for your local agent. You can use either or both. They cover the same steps at different levels of prescription. |
 | I have two projects and want one card to cover both | Don't. Write two cards. The whole point is project-specific discipline — a card that averages two projects will be useless for both. |
 

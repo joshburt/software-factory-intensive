@@ -16,12 +16,12 @@ One or two paragraphs answering:
 
 If this is a greenfield project, describe the vision. If it's an existing codebase, describe its current state and where you want to take it.
 
-## 2. Size, Type, Languages, Resource Constraints
+## 2. Size, Type, Resource Constraints
 
 - **Size**: rough scale — "prototype", "small service", "mid-size SaaS", "large monorepo"
-- **Type**: web app, mobile app, backend service, CLI, library, infra-as-code, data pipeline, etc.
-- **Languages / frameworks**: what's in the stack? (don't worry about being exhaustive — your agent will probe for specifics)
-- **Runtime / platform**: browser, Node, Go server, Lambda, Kubernetes, iOS, etc.
+- **Type**: web app, backend service, CLI, library, data pipeline, etc.
+- **Tech stack**: The stack is mandated by [`ENGINEERING_STANDARD.md`](ENGINEERING_STANDARD.md) — Python >= 3.11, FastAPI, SQLAlchemy, Pydantic, Alembic, pytest, Playwright, and the full toolchain defined there. Your project manifest (copied from [`PROJECT_MANIFEST_TEMPLATE.md`](PROJECT_MANIFEST_TEMPLATE.md)) ships pre-filled with the exact table. You do not need to describe or choose the stack here; just focus on what your software does.
+- **Runtime / platform**: server-side Python application (FastAPI behind uvicorn), with Jinja2 server-rendered templates. No SPA framework.
 - **Resource constraints**: memory / CPU / latency budgets, target platforms, regulatory or compliance requirements, team size, timeline pressures
 
 ## 3. Potential SDLC Service Integrations

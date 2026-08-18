@@ -253,7 +253,7 @@ $EDITOR packs/lessons/L2/agents/planner/prompt.template.md
 Add to the Inputs section:
 
 ```markdown
-Before writing acceptance criteria, use the Context7 MCP to look up the latest node:test API. Reference specific node:test features (describe, it, assert methods) in the acceptance criteria.
+Before writing acceptance criteria, use the Context7 MCP to look up the latest pytest API. Reference specific pytest features (fixtures, parametrize, raises) in the acceptance criteria.
 ```
 
 3. Restart and re-sling:
@@ -262,9 +262,9 @@ Before writing acceptance criteria, use the Context7 MCP to look up the latest n
        gc sling <rig>/factory.planner "Plan <another feature>" \
          --on mol-feature-intake
 
-4. Compare the two plan artifacts. The second plan should reference specific node:test API details (assert.strictEqual, describe blocks) that came from Context7 — not generic knowledge.
+4. Compare the two plan artifacts. The second plan should reference specific pytest API details (`pytest.raises`, `@pytest.mark.parametrize`, fixture scopes) that came from Context7 — not generic knowledge.
 
-Without the MCP, the planner guesses what the node:test API looks like. With it, the planner checks.
+Without the MCP, the planner guesses what the pytest API looks like. With it, the planner checks.
 
 ## Part 6: Record Notes
 

@@ -36,7 +36,7 @@ Each session directory contains:
 The PROMPT.md includes:
 - Discovery questions to surface project-specific decisions
 - Concrete build steps with Gas City commands
-- Suggestions tailored to different project types (React, API, infra, mobile, etc.)
+- Suggestions tailored to different kinds of work (API endpoint, data model, UI page, background job, etc.)
 - Config discipline checkpoints
 
 ## Progression

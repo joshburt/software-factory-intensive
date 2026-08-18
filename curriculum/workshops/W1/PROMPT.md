@@ -57,9 +57,11 @@ Use the SPEC-CONTEXT-CONSTRAINT-CRITERIA structure:
 
 ## Suggestions Based on Project Type
 
-- **If their project uses React/TypeScript**: Suggest constraining the agent to "use existing component patterns in src/components" rather than inventing new ones
-- **If their project has a backend API**: Suggest the context reset rule "start fresh when switching between frontend and backend work"
-- **If their project uses a monorepo**: Suggest explicit constraints about which package the agent should modify
+The stack is mandated by [`ENGINEERING_STANDARD.md`](../../ENGINEERING_STANDARD.md) (Python, FastAPI, SQLAlchemy, Pydantic, pytest, Playwright). Within that stack, tailor by the kind of work:
+
+- **If this is an API endpoint feature**: Suggest constraining the agent to "use existing router patterns in src/<pkg>/api/routers/" rather than inventing new ones
+- **If this touches the data model**: Suggest the context reset rule "start fresh after a schema change" and flag that migrations are human-approved
+- **If this is a UI page**: Suggest reference files under `src/<pkg>/api/templates/` and note that testing uses Playwright
 - **If they use Jira/Linear**: Suggest the prompt template reference ticket IDs directly as the Spec
 
 ## Gas City Connection

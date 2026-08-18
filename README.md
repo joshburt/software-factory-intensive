@@ -27,7 +27,9 @@ Please read the [installation guide](installation.md) to install the necessary t
 
 ### 5. Software Project Overview
 
-You should bring a real software project to build your factory around. Before starting the curriculum, write a **Project Overview** for it in `~/path/to/your-project/docs/PROJECT_OVERVIEW.md` using [`PROJECT_OVERVIEW_TEMPLATE.md`](curriculum/PROJECT_OVERVIEW_TEMPLATE.md) — a loosely structured document that answers a few questions about the project.
+You should bring a real software project to build your factory around. The project uses the mandated stack defined in [`curriculum/ENGINEERING_STANDARD.md`](curriculum/ENGINEERING_STANDARD.md) — Python >= 3.11, FastAPI, SQLAlchemy 2.0, Pydantic v2, Alembic, pytest, Playwright, and the full toolchain documented there. The stack is not optional and not a choice; it is the contract your factory's agents rely on to produce consistent output.
+
+Before starting the curriculum, write a **Project Overview** for your project in `~/path/to/your-project/docs/PROJECT_OVERVIEW.md` using [`PROJECT_OVERVIEW_TEMPLATE.md`](curriculum/PROJECT_OVERVIEW_TEMPLATE.md) — a loosely structured document that answers a few questions about the project.
 
 ```bash
 mkdir -p ~/path/to/your-project/docs
@@ -38,6 +40,8 @@ Then fill in the template with your project details. See [`reference-project/fir
 
 
 ### 6. Generate the Project Manifest and Software Factory Manifest
+
+The tech stack is mandated by [`curriculum/ENGINEERING_STANDARD.md`](curriculum/ENGINEERING_STANDARD.md). The project manifest (which you will generate from [`curriculum/PROJECT_MANIFEST_TEMPLATE.md`](curriculum/PROJECT_MANIFEST_TEMPLATE.md)) ships pre-filled with the mandated stack so your agents inherit it automatically.
 
 While in your project directory, download and install the [Manifest Generator Skill](https://github.com/audiojak/manifest-generator):
 
