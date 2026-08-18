@@ -1,4 +1,5 @@
 scope = "rig"
+session = "tmux"
 wake_mode = "fresh"
 work_dir = ".gc/agents/{{.Rig}}/release-delivery-validator"
 nudge = "Run gc prime, inspect the routed formula step, rerun tests, write docs/validation/<slug>.md, then close the current step."

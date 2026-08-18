@@ -1,4 +1,5 @@
 scope = "rig"
+session = "tmux"
 wake_mode = "fresh"
 work_dir = ".gc/agents/{{.Rig}}/feature-delivery-designer"
 nudge = "Run gc prime, inspect the routed formula step, write docs/designs/<slug>.md, then close the current step."
